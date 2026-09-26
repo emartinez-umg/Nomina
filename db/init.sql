@@ -1,0 +1,9 @@
+-- Instalación NUEVA del ERP completo. No ejecutar sobre un esquema poblado.
+WHENEVER OSERROR EXIT FAILURE
+WHENEVER SQLERROR EXIT SQL.SQLCODE
+SET DEFINE OFF
+@@ERP_ESQUEMA_FINAL.sql
+@@RH_SEGUIMIENTO.sql
+@@seed.sql
+@@ERP_CATALOGOS.sql
+COMMIT;

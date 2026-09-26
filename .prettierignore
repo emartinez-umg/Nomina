@@ -1,0 +1,7 @@
+node_modules/
+frontend/dist/
+shared/schema.json
+db/schema-erp.json
+backups/
+tmp/
+package-lock.json

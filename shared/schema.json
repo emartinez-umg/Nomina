@@ -1,0 +1,6774 @@
+{
+  "version": "2026-09-11-hr",
+  "tables": [
+    {
+      "name": "NOM_PUESTO",
+      "pk": "PUE_ID",
+      "slug": "puesto",
+      "title": "Puestos",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "PUE_ID",
+          "label": "Puesto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PUE_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Asistente de Recursos Humanos"
+        },
+        {
+          "name": "PUE_ES_VENDEDOR",
+          "label": "Es vendedor",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PUE_VENDEDOR",
+          "sql": "PUE_ES_VENDEDOR IN(0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PUE_ES_VENDEDOR"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_PUESTO",
+          "fields": [
+            "PUE_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "PUE_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIPO_CONTRATO",
+      "pk": "TCT_ID",
+      "slug": "tipo-contrato",
+      "title": "Tipos de contrato",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "TCT_ID",
+          "label": "Tipo de contrato",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TCT_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "Indefinido"
+        },
+        {
+          "name": "TCT_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_TCT_ACTIVO",
+          "sql": "TCT_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "TCT_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_TCT_NOMBRE",
+          "fields": [
+            "TCT_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "TCT_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "TCT_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIPO_AUSENCIA",
+      "pk": "TAU_ID",
+      "slug": "tipo-ausencia",
+      "title": "Tipos de ausencia",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "TAU_ID",
+          "label": "Tipo de ausencia",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TAU_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 40,
+          "boolean": false,
+          "example": "Permiso personal"
+        }
+      ],
+      "checks": [],
+      "unique": [
+        {
+          "name": "UQ_NOM_TAU_NOMBRE",
+          "fields": [
+            "TAU_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "TAU_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_MOTIVO_BAJA",
+      "pk": "MBA_ID",
+      "slug": "motivo-baja",
+      "title": "Motivos de baja",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "MBA_ID",
+          "label": "Motivo de baja",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "MBA_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Renuncia"
+        },
+        {
+          "name": "MBA_GENERA_INDEMNIZACION",
+          "label": "De generación indemnización",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_MBA_INDEM",
+          "sql": "MBA_GENERA_INDEMNIZACION IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "MBA_GENERA_INDEMNIZACION"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_MBA_NOMBRE",
+          "fields": [
+            "MBA_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "MBA_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIPO_DIA",
+      "pk": "TDI_ID",
+      "slug": "tipo-dia",
+      "title": "Tipos de día",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "TDI_ID",
+          "label": "Tipo de día",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TDI_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 30,
+          "boolean": false,
+          "example": "Ordinario"
+        }
+      ],
+      "checks": [],
+      "unique": [
+        {
+          "name": "UQ_NOM_TDI_NOMBRE",
+          "fields": [
+            "TDI_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "TDI_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIPO_INGRESO",
+      "pk": "TIN_ID",
+      "slug": "tipo-ingreso",
+      "title": "Tipos de ingreso",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "TIN_ID",
+          "label": "Tipo de ingreso",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TIN_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "Bono por desempeño"
+        },
+        {
+          "name": "TIN_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_TIN_ACTIVO",
+          "sql": "TIN_ACTIVO=0 OR TIN_ACTIVO=1",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "=",
+              "left": {
+                "field": "TIN_ACTIVO"
+              },
+              "right": {
+                "literal": "0"
+              }
+            },
+            "right": {
+              "op": "=",
+              "left": {
+                "field": "TIN_ACTIVO"
+              },
+              "right": {
+                "literal": "1"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_TIN_NOMBRE",
+          "fields": [
+            "TIN_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "TIN_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "TIN_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIPO_DESCUENTO",
+      "pk": "TDE_ID",
+      "slug": "tipo-descuento",
+      "title": "Tipos de descuento",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "TDE_ID",
+          "label": "Tipo de descuento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TDE_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "Descuento de tienda"
+        },
+        {
+          "name": "TDE_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_TDE_ACTIVO",
+          "sql": "TDE_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "TDE_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_TDE_NOMBRE",
+          "fields": [
+            "TDE_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "TDE_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "TDE_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_CONCEPTO",
+      "pk": "NCO_ID",
+      "slug": "concepto",
+      "title": "Conceptos",
+      "group": "catalogos",
+      "fields": [
+        {
+          "name": "NCO_ID",
+          "label": "Concepto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NCO_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Sueldo base"
+        },
+        {
+          "name": "NCO_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "INGRESO"
+        },
+        {
+          "name": "NCO_AFECTA_IGSS",
+          "label": "Afecta IGSS",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "boolean": true,
+          "example": "Sí / no"
+        },
+        {
+          "name": "NCO_AFECTA_ISR",
+          "label": "Afecta ISR",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "boolean": true,
+          "example": "Sí / no"
+        },
+        {
+          "name": "NCO_MONTO_FIJO",
+          "label": "Monto fijo",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "hint": "Importe fijo opcional del concepto.",
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NCO_OBLIGATORIO",
+          "label": "Obligatorio",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NCO_OBLIGATORIO",
+          "sql": "NCO_OBLIGATORIO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NCO_OBLIGATORIO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_CONCEPTO",
+          "fields": [
+            "NCO_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "NCO_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_EMPLEADO",
+      "pk": "EML_ID",
+      "slug": "empleado",
+      "title": "Empleados",
+      "group": "empleados",
+      "description": "Registra la persona, empresa y salario. El puesto, la sucursal y la fecha de ingreso se administran en Relaciones laborales.",
+      "fields": [
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PERSONA",
+            "pk": "PER_ID",
+            "constraint": "FK_EML_PER"
+          },
+          "boolean": false,
+          "example": "Busca persona"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_EML_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "EML_CODIGO",
+          "label": "Código",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "boolean": false,
+          "example": "EMP-001"
+        },
+        {
+          "name": "EML_IGSS",
+          "label": "IGSS",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 30,
+          "boolean": false,
+          "example": "123456789"
+        },
+        {
+          "name": "EML_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        },
+        {
+          "name": "EML_SALARIO_ORDINARIO_MENSUAL",
+          "label": "Salario ordinario mensual",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "hint": "Importe mensual ordinario, mayor que cero. La bonificación se registra por separado.",
+          "min": "0",
+          "exclusiveMin": true,
+          "boolean": false,
+          "example": "5500.00"
+        },
+        {
+          "name": "EML_SALARIO_BONIFICACION_DECRETO",
+          "label": "Bonificación decreto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "hint": "Importe de bonificación decreto, igual o mayor que cero.",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "250.00"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_EML_ACTIVO",
+          "sql": "EML_ACTIVO IN(0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "EML_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_EML_SAL_BON",
+          "sql": "EML_SALARIO_BONIFICACION_DECRETO >= 0",
+          "ast": {
+            "op": ">=",
+            "left": {
+              "field": "EML_SALARIO_BONIFICACION_DECRETO"
+            },
+            "right": {
+              "literal": "0"
+            }
+          }
+        },
+        {
+          "name": "CK_EML_SAL_ORD",
+          "sql": "EML_SALARIO_ORDINARIO_MENSUAL > 0",
+          "ast": {
+            "op": ">",
+            "left": {
+              "field": "EML_SALARIO_ORDINARIO_MENSUAL"
+            },
+            "right": {
+              "literal": "0"
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_EML_EMP_PER",
+          "fields": [
+            "EMP_ID",
+            "PER_ID"
+          ]
+        },
+        {
+          "name": "UQ_NOM_EMPLEADO",
+          "fields": [
+            "EMP_ID",
+            "EML_CODIGO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "EML_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "PER_ID",
+        "EML_CODIGO"
+      ]
+    },
+    {
+      "name": "NOM_RELACION_LABORAL",
+      "pk": "RLA_ID",
+      "slug": "relacion-laboral",
+      "title": "Relaciones laborales",
+      "group": "empleados",
+      "fields": [
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_NOM_RLA_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "PUE_ID",
+          "label": "Puesto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PUESTO",
+            "pk": "PUE_ID",
+            "constraint": "FK_NOM_RLA_PUE"
+          },
+          "boolean": false,
+          "example": "Busca puesto"
+        },
+        {
+          "name": "SUC_ID",
+          "label": "Sucursal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_SUCURSAL",
+            "pk": "SUC_ID",
+            "constraint": "FK_NOM_RLA_SUC"
+          },
+          "boolean": false,
+          "example": "Busca sucursal"
+        },
+        {
+          "name": "DPT_ID",
+          "label": "Departamento",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_DEPARTAMENTO",
+            "pk": "DPT_ID",
+            "constraint": "FK_NOM_RLA_DPT"
+          },
+          "boolean": false,
+          "example": "Busca departamento"
+        },
+        {
+          "name": "RLA_FECHA_INGRESO",
+          "label": "Fecha ingreso",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "RLA_FECHA_BAJA",
+          "label": "Fecha baja",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "RLA_MOTIVO_BAJA",
+          "label": "Motivo baja",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 300,
+          "boolean": false,
+          "example": "Renuncia presentada por el empleado"
+        },
+        {
+          "name": "RLA_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "ACTIVA",
+            "FINALIZADA",
+            "SUSPENDIDA"
+          ],
+          "boolean": false,
+          "example": "ACTIVA"
+        },
+        {
+          "name": "USU_ID_CREA",
+          "label": "Usuario creador",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_USUARIO",
+            "pk": "USU_ID",
+            "constraint": "FK_NOM_RLA_USU_CREA"
+          },
+          "boolean": false,
+          "example": "Busca usuario creador"
+        },
+        {
+          "name": "RLA_FECHA_CREA",
+          "label": "Fecha de creación",
+          "type": "TIMESTAMP",
+          "required": true,
+          "identity": false,
+          "default": "SYSTIMESTAMP",
+          "boolean": false,
+          "example": "Se asignará al guardar"
+        },
+        {
+          "name": "MBA_ID",
+          "label": "Motivo de baja",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_MOTIVO_BAJA",
+            "pk": "MBA_ID",
+            "constraint": "FK_NOM_RLA_MBA"
+          },
+          "boolean": false,
+          "example": "Busca motivo de baja"
+        },
+        {
+          "name": "TCT_ID",
+          "label": "Tipo de contrato",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIPO_CONTRATO",
+            "pk": "TCT_ID",
+            "constraint": "FK_NOM_RLA_TCT"
+          },
+          "boolean": false,
+          "example": "Busca tipo de contrato"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_RLA_ESTADO",
+          "sql": "RLA_ESTADO IN ('ACTIVA','FINALIZADA','SUSPENDIDA')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "RLA_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "ACTIVA"
+              },
+              {
+                "literal": "FINALIZADA"
+              },
+              {
+                "literal": "SUSPENDIDA"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_RLA_FECHAS",
+          "sql": "RLA_FECHA_BAJA IS NULL OR RLA_FECHA_BAJA >= RLA_FECHA_INGRESO",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "RLA_FECHA_BAJA"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "RLA_FECHA_BAJA"
+              },
+              "right": {
+                "field": "RLA_FECHA_INGRESO"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "state",
+        "field": "RLA_ESTADO",
+        "label": "Editar estado"
+      },
+      "labelFields": [
+        "EML_ID",
+        "PUE_ID",
+        "RLA_FECHA_INGRESO"
+      ]
+    },
+    {
+      "name": "NOM_JEFATURA_LABORAL",
+      "pk": "JRL_ID",
+      "slug": "jefatura-laboral",
+      "title": "Jefaturas laborales",
+      "group": "empleados",
+      "fields": [
+        {
+          "name": "JRL_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "RLA_ID_SUBORDINADO",
+          "label": "Relación del subordinado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_JRL_SUB"
+          },
+          "boolean": false,
+          "example": "Busca relación del subordinado"
+        },
+        {
+          "name": "RLA_ID_JEFE",
+          "label": "Relación del jefe",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_JRL_JEF"
+          },
+          "boolean": false,
+          "example": "Busca relación del jefe"
+        },
+        {
+          "name": "JRL_FECHA_DESDE",
+          "label": "Fecha desde",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "JRL_FECHA_HASTA",
+          "label": "Fecha hasta",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "JRL_ACTIVA",
+          "label": "Activa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_JRL_ACTIVA",
+          "sql": "JRL_ACTIVA IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "JRL_ACTIVA"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_JRL_DISTINTOS",
+          "sql": "RLA_ID_SUBORDINADO <> RLA_ID_JEFE",
+          "ast": {
+            "op": "<>",
+            "left": {
+              "field": "RLA_ID_SUBORDINADO"
+            },
+            "right": {
+              "field": "RLA_ID_JEFE"
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_JRL_FECHAS",
+          "sql": "JRL_FECHA_HASTA IS NULL OR JRL_FECHA_HASTA >= JRL_FECHA_DESDE",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "JRL_FECHA_HASTA"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "JRL_FECHA_HASTA"
+              },
+              "right": {
+                "field": "JRL_FECHA_DESDE"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_JRL_VIGENCIA",
+          "fields": [
+            "RLA_ID_SUBORDINADO",
+            "RLA_ID_JEFE",
+            "JRL_FECHA_DESDE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "JRL_ACTIVA",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "JRL_ID"
+      ]
+    },
+    {
+      "name": "NOM_CONTACTO_EMERGENCIA",
+      "pk": "NCE_ID",
+      "slug": "contacto-emergencia",
+      "title": "Contactos de emergencia",
+      "group": "empleados",
+      "fields": [
+        {
+          "name": "NCE_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_NOM_NCE_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "NCE_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "María López"
+        },
+        {
+          "name": "NCE_PARENTESCO",
+          "label": "Parentesco",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "Madre"
+        },
+        {
+          "name": "NCE_TELEFONO",
+          "label": "Teléfono",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 30,
+          "boolean": false,
+          "input": "tel",
+          "example": "1234-5678"
+        },
+        {
+          "name": "NCE_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_NCE_PRINCIPAL",
+          "sql": "NCE_PRINCIPAL IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NCE_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_NCE_PERSONA",
+          "fields": [
+            "EML_ID",
+            "NCE_TELEFONO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "NCE_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_CUENTA_BANCARIA_EMPLEADO",
+      "pk": "CBE_ID",
+      "slug": "cuenta-bancaria-empleado",
+      "title": "Cuentas bancarias",
+      "group": "empleados",
+      "fields": [
+        {
+          "name": "CBE_ID",
+          "label": "Cuenta bancaria",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_CBE_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "CBE_NUMERO",
+          "label": "Número",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 40,
+          "boolean": false,
+          "example": "00123456789"
+        },
+        {
+          "name": "CBE_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "boolean": false,
+          "example": "AHORRO"
+        },
+        {
+          "name": "CBE_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        },
+        {
+          "name": "BAN_ID",
+          "label": "Banco",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_BANCO",
+            "pk": "BAN_ID",
+            "constraint": "FK_NOM_CBE_BAN"
+          },
+          "boolean": false,
+          "example": "Busca banco"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_CBE_PRINCIPAL",
+          "sql": "CBE_PRINCIPAL IN(0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "CBE_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_CUENTA_BANCARIA",
+          "fields": [
+            "EML_ID",
+            "CBE_NUMERO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "EML_ID",
+        "BAN_ID",
+        "CBE_NUMERO"
+      ]
+    },
+    {
+      "name": "NOM_JORNADA",
+      "pk": "JOR_ID",
+      "slug": "jornada",
+      "title": "Jornadas",
+      "group": "jornadas",
+      "fields": [
+        {
+          "name": "JOR_ID",
+          "label": "Jornada",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_NOM_JOR_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "JOR_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Jornada diurna"
+        },
+        {
+          "name": "JOR_ACTIVA",
+          "label": "Activa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_JOR_ACTIVA",
+          "sql": "JOR_ACTIVA IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "JOR_ACTIVA"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_JORNADA",
+          "fields": [
+            "EMP_ID",
+            "JOR_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "JOR_ACTIVA",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "JOR_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_JORNADA_DETALLE",
+      "pk": "JOD_ID",
+      "slug": "jornada-detalle",
+      "title": "Detalle de jornadas",
+      "group": "jornadas",
+      "fields": [
+        {
+          "name": "JOD_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "JOR_ID",
+          "label": "Jornada",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_JORNADA",
+            "pk": "JOR_ID",
+            "constraint": "FK_NOM_JOD_JOR"
+          },
+          "boolean": false,
+          "example": "Busca jornada"
+        },
+        {
+          "name": "JOD_DIA_SEMANA",
+          "label": "Dia semana",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "boolean": false,
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7"
+          ],
+          "example": "1"
+        },
+        {
+          "name": "JOD_HORA_ENTRADA",
+          "label": "Hora entrada",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 5,
+          "input": "time",
+          "boolean": false,
+          "example": "08:00"
+        },
+        {
+          "name": "JOD_HORA_SALIDA",
+          "label": "Hora salida",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 5,
+          "input": "time",
+          "boolean": false,
+          "example": "17:00"
+        },
+        {
+          "name": "JOD_MINUTOS_DESCANSO",
+          "label": "Minutos descanso",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 4,
+          "scale": 0,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "60"
+        },
+        {
+          "name": "JOD_MINUTOS_ORDINARIOS",
+          "label": "Minutos ordinarios",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 4,
+          "scale": 0,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "480"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_JOD_DIA",
+          "sql": "JOD_DIA_SEMANA BETWEEN 1 AND 7",
+          "ast": {
+            "op": "between",
+            "left": {
+              "field": "JOD_DIA_SEMANA"
+            },
+            "min": {
+              "literal": "1"
+            },
+            "max": {
+              "literal": "7"
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_JOD_MINUTOS",
+          "sql": "JOD_MINUTOS_DESCANSO >= 0 AND JOD_MINUTOS_ORDINARIOS >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": ">=",
+              "left": {
+                "field": "JOD_MINUTOS_DESCANSO"
+              },
+              "right": {
+                "literal": "0"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "JOD_MINUTOS_ORDINARIOS"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_JOD_DIA",
+          "fields": [
+            "JOR_ID",
+            "JOD_DIA_SEMANA"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "JOD_HORA_ENTRADA"
+      ]
+    },
+    {
+      "name": "NOM_RELACION_JORNADA",
+      "pk": "RLJ_ID",
+      "slug": "relacion-jornada",
+      "title": "Asignación de jornadas",
+      "group": "jornadas",
+      "fields": [
+        {
+          "name": "RLJ_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_RLJ_RLA"
+          },
+          "boolean": false,
+          "example": "Busca relación laboral"
+        },
+        {
+          "name": "JOR_ID",
+          "label": "Jornada",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_JORNADA",
+            "pk": "JOR_ID",
+            "constraint": "FK_NOM_RLJ_JOR"
+          },
+          "boolean": false,
+          "example": "Busca jornada"
+        },
+        {
+          "name": "RLJ_FECHA_DESDE",
+          "label": "Fecha desde",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "RLJ_FECHA_HASTA",
+          "label": "Fecha hasta",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_RLJ_FECHAS",
+          "sql": "RLJ_FECHA_HASTA IS NULL OR RLJ_FECHA_HASTA >= RLJ_FECHA_DESDE",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "RLJ_FECHA_HASTA"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "RLJ_FECHA_HASTA"
+              },
+              "right": {
+                "field": "RLJ_FECHA_DESDE"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_RLJ_VIGENCIA",
+          "fields": [
+            "RLA_ID",
+            "JOR_ID",
+            "RLJ_FECHA_DESDE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "RLJ_ID"
+      ]
+    },
+    {
+      "name": "NOM_PERIODO",
+      "pk": "NPE_ID",
+      "slug": "periodo",
+      "title": "Períodos",
+      "group": "planilla",
+      "description": "Calendario compartido entre empresas. Define año, mes y, si corresponde, quincena; la empresa se asigna en la planilla.",
+      "fields": [
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NPE_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "Quincena"
+        },
+        {
+          "name": "NPE_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "ABIERTO",
+            "CALCULADO",
+            "PAGADO",
+            "CERRADO"
+          ],
+          "boolean": false,
+          "example": "ABIERTO"
+        },
+        {
+          "name": "NPE_QUINCENA",
+          "label": "Quincena",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "hint": "Primera o segunda quincena. Déjalo sin seleccionar si no corresponde.",
+          "options": [
+            "1",
+            "2"
+          ],
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NPE_ANIO",
+          "label": "Año",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 4,
+          "scale": 0,
+          "hint": "Año del período. Hasta cuatro dígitos.",
+          "boolean": false,
+          "example": "2026"
+        },
+        {
+          "name": "NPE_MES",
+          "label": "Mes",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 2,
+          "scale": 0,
+          "boolean": false,
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"
+          ],
+          "example": "1"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_NPE_MES",
+          "sql": "NPE_MES BETWEEN 1 AND 12",
+          "ast": {
+            "op": "between",
+            "left": {
+              "field": "NPE_MES"
+            },
+            "min": {
+              "literal": "1"
+            },
+            "max": {
+              "literal": "12"
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_NPE_QUINCENA",
+          "sql": "NPE_QUINCENA IN (1,2) OR NPE_QUINCENA IS NULL",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "in",
+              "left": {
+                "field": "NPE_QUINCENA"
+              },
+              "values": [
+                {
+                  "literal": "1"
+                },
+                {
+                  "literal": "2"
+                }
+              ]
+            },
+            "right": {
+              "op": "null",
+              "left": {
+                "field": "NPE_QUINCENA"
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NPE_ESTADO",
+          "sql": "NPE_ESTADO IN('ABIERTO','CALCULADO','PAGADO','CERRADO')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NPE_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "ABIERTO"
+              },
+              {
+                "literal": "CALCULADO"
+              },
+              {
+                "literal": "PAGADO"
+              },
+              {
+                "literal": "CERRADO"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_PERIODO",
+          "fields": [
+            "NPE_ANIO",
+            "NPE_MES",
+            "NPE_QUINCENA"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "state",
+        "field": "NPE_ESTADO",
+        "label": "Editar estado"
+      },
+      "labelFields": [
+        "NPE_ANIO",
+        "NPE_MES",
+        "NPE_QUINCENA",
+        "NPE_TIPO"
+      ]
+    },
+    {
+      "name": "NOM_NOMINA",
+      "pk": "NOM_ID",
+      "slug": "nomina",
+      "title": "Planillas",
+      "group": "planilla",
+      "description": "Cada planilla pertenece a una empresa y utiliza un período del calendario compartido.",
+      "fields": [
+        {
+          "name": "NOM_ID",
+          "label": "Planilla",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PERIODO",
+            "pk": "NPE_ID",
+            "constraint": "FK_NOM_NPE"
+          },
+          "boolean": false,
+          "example": "Busca período"
+        },
+        {
+          "name": "NOM_FECHA_GENERA",
+          "label": "Fecha de generación",
+          "type": "TIMESTAMP",
+          "required": true,
+          "identity": false,
+          "default": "SYSTIMESTAMP",
+          "boolean": false,
+          "example": "Se asignará al guardar"
+        },
+        {
+          "name": "NOM_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "BORRADOR",
+            "CALCULADA",
+            "PAGADA",
+            "ANULADA"
+          ],
+          "boolean": false,
+          "example": "BORRADOR"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_NOM_NOM_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_ESTADO",
+          "sql": "NOM_ESTADO IN('BORRADOR','CALCULADA','PAGADA','ANULADA')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NOM_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "BORRADOR"
+              },
+              {
+                "literal": "CALCULADA"
+              },
+              {
+                "literal": "PAGADA"
+              },
+              {
+                "literal": "ANULADA"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_NOMINA_PERIODO",
+          "fields": [
+            "NPE_ID",
+            "EMP_ID"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "cancel",
+        "field": "NOM_ESTADO",
+        "value": "ANULADA",
+        "label": "Anular"
+      },
+      "labelFields": [
+        "EMP_ID",
+        "NPE_ID",
+        "NOM_ESTADO"
+      ]
+    },
+    {
+      "name": "NOM_NOMINA_DETALLE",
+      "pk": "NOD_ID",
+      "slug": "nomina-detalle",
+      "title": "Detalle de planillas",
+      "group": "planilla",
+      "description": "Selecciona la relación laboral correspondiente al empleado para esta planilla.",
+      "fields": [
+        {
+          "name": "NOD_ID",
+          "label": "Detalle de planilla",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NOM_ID",
+          "label": "Planilla",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_NOMINA",
+            "pk": "NOM_ID",
+            "constraint": "FK_NOD_NOM"
+          },
+          "boolean": false,
+          "example": "Busca planilla"
+        },
+        {
+          "name": "NOD_INGRESOS",
+          "label": "Ingresos",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "default": "0",
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NOD_DEDUCCIONES",
+          "label": "Deducciones",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "default": "0",
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NOD_LIQUIDO",
+          "label": "Líquido",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_NOD_RLA"
+          },
+          "boolean": false,
+          "example": "Busca relación laboral"
+        },
+        {
+          "name": "NOD_DIAS_TRABAJADOS",
+          "label": "Días trabajados",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "15"
+        },
+        {
+          "name": "NOD_HORAS_ORDINARIAS",
+          "label": "Horas ordinarias",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "NOD_HORAS_EXTRA",
+          "label": "Horas extra",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "DTE_ID",
+          "label": "Documento tributario",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "CXC_DTE",
+            "pk": "DTE_ID",
+            "constraint": "FK_NOM_NOD_DTE"
+          },
+          "boolean": false,
+          "example": "Busca documento tributario"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_NOD_RESUMEN",
+          "sql": "NOD_DIAS_TRABAJADOS >= 0 AND NOD_HORAS_ORDINARIAS >= 0 AND NOD_HORAS_EXTRA >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": "and",
+              "left": {
+                "op": ">=",
+                "left": {
+                  "field": "NOD_DIAS_TRABAJADOS"
+                },
+                "right": {
+                  "literal": "0"
+                }
+              },
+              "right": {
+                "op": ">=",
+                "left": {
+                  "field": "NOD_HORAS_ORDINARIAS"
+                },
+                "right": {
+                  "literal": "0"
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "NOD_HORAS_EXTRA"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_NOD_RLA",
+          "fields": [
+            "NOM_ID",
+            "RLA_ID"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "RLA_ID",
+        "NOM_ID"
+      ]
+    },
+    {
+      "name": "NOM_NOMINA_CONCEPTO",
+      "pk": "NDC_ID",
+      "slug": "nomina-concepto",
+      "title": "Conceptos de planilla",
+      "group": "planilla",
+      "fields": [
+        {
+          "name": "NDC_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NOD_ID",
+          "label": "Detalle de planilla",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_NOMINA_DETALLE",
+            "pk": "NOD_ID",
+            "constraint": "FK_NDC_NOD"
+          },
+          "boolean": false,
+          "example": "Busca detalle de planilla"
+        },
+        {
+          "name": "NCO_ID",
+          "label": "Concepto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_CONCEPTO",
+            "pk": "NCO_ID",
+            "constraint": "FK_NDC_NCO"
+          },
+          "boolean": false,
+          "example": "Busca concepto"
+        },
+        {
+          "name": "NDC_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        }
+      ],
+      "checks": [],
+      "unique": [],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "NDC_ID"
+      ]
+    },
+    {
+      "name": "NOM_MARCAJE",
+      "pk": "MRC_ID",
+      "slug": "marcaje",
+      "title": "Marcajes",
+      "group": "asistencia",
+      "fields": [
+        {
+          "name": "MRC_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_MRC_RLA"
+          },
+          "boolean": false,
+          "example": "Busca relación laboral"
+        },
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PERIODO",
+            "pk": "NPE_ID",
+            "constraint": "FK_NOM_MRC_NPE"
+          },
+          "boolean": false,
+          "example": "Busca período"
+        },
+        {
+          "name": "AUS_ID",
+          "label": "Ausencia",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_AUSENCIA",
+            "pk": "AUS_ID",
+            "constraint": "FK_NOM_MRC_AUS"
+          },
+          "boolean": false,
+          "example": "Busca ausencia"
+        },
+        {
+          "name": "VAC_ID",
+          "label": "Vacaciones",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_VACACION",
+            "pk": "VAC_ID",
+            "constraint": "FK_NOM_MRC_VAC"
+          },
+          "boolean": false,
+          "example": "Busca vacaciones"
+        },
+        {
+          "name": "TDI_ID",
+          "label": "Tipo de día",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIPO_DIA",
+            "pk": "TDI_ID",
+            "constraint": "FK_NOM_MRC_TDI"
+          },
+          "boolean": false,
+          "example": "Busca tipo de día"
+        },
+        {
+          "name": "MRC_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "MRC_ENTRADA",
+          "label": "Entrada",
+          "type": "TIMESTAMP",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026 08:00"
+        },
+        {
+          "name": "MRC_SALIDA",
+          "label": "Salida",
+          "type": "TIMESTAMP",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026 08:00"
+        },
+        {
+          "name": "MRC_HORAS_ORDINARIAS",
+          "label": "Horas ordinarias",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "MRC_HORAS_EXTRA_DIURNAS",
+          "label": "Horas extra diurnas",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "MRC_HORAS_EXTRA_NOCTURNAS",
+          "label": "Horas extra nocturnas",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 7,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "MRC_MINUTOS_TARDANZA",
+          "label": "Minutos tardanza",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 5,
+          "scale": 0,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "15"
+        },
+        {
+          "name": "MRC_OBSERVACION",
+          "label": "Observación",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 500,
+          "boolean": false,
+          "example": "Detalle adicional para Recursos Humanos"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_MRC_HORAS",
+          "sql": "MRC_HORAS_ORDINARIAS >= 0 AND MRC_HORAS_EXTRA_DIURNAS >= 0 AND MRC_HORAS_EXTRA_NOCTURNAS >= 0 AND MRC_MINUTOS_TARDANZA >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": "and",
+              "left": {
+                "op": "and",
+                "left": {
+                  "op": ">=",
+                  "left": {
+                    "field": "MRC_HORAS_ORDINARIAS"
+                  },
+                  "right": {
+                    "literal": "0"
+                  }
+                },
+                "right": {
+                  "op": ">=",
+                  "left": {
+                    "field": "MRC_HORAS_EXTRA_DIURNAS"
+                  },
+                  "right": {
+                    "literal": "0"
+                  }
+                }
+              },
+              "right": {
+                "op": ">=",
+                "left": {
+                  "field": "MRC_HORAS_EXTRA_NOCTURNAS"
+                },
+                "right": {
+                  "literal": "0"
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "MRC_MINUTOS_TARDANZA"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_MRC_MARCAS",
+          "sql": "MRC_SALIDA IS NULL OR MRC_ENTRADA IS NULL OR MRC_SALIDA >= MRC_ENTRADA",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "or",
+              "left": {
+                "op": "null",
+                "left": {
+                  "field": "MRC_SALIDA"
+                }
+              },
+              "right": {
+                "op": "null",
+                "left": {
+                  "field": "MRC_ENTRADA"
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "MRC_SALIDA"
+              },
+              "right": {
+                "field": "MRC_ENTRADA"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_MARCAJE_DIA",
+          "fields": [
+            "RLA_ID",
+            "MRC_FECHA"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "MRC_OBSERVACION"
+      ]
+    },
+    {
+      "name": "NOM_AUSENCIA",
+      "pk": "AUS_ID",
+      "slug": "ausencia",
+      "title": "Ausencias",
+      "group": "asistencia",
+      "fields": [
+        {
+          "name": "AUS_ID",
+          "label": "Ausencia",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_AUS_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "AUS_FECHA_INICIO",
+          "label": "Fecha inicio",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "AUS_FECHA_FIN",
+          "label": "Fecha fin",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "AUS_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "Estado acordado por tu organización"
+        },
+        {
+          "name": "TAU_ID",
+          "label": "Tipo de ausencia",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIPO_AUSENCIA",
+            "pk": "TAU_ID",
+            "constraint": "FK_NOM_AUS_TAU"
+          },
+          "boolean": false,
+          "example": "Busca tipo de ausencia"
+        },
+        {
+          "name": "AUS_CON_GOCE_SALARIO",
+          "label": "Con goce salario",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        },
+        {
+          "name": "AUS_CERTIFICADO_IGSS",
+          "label": "Certificado IGSS",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "CERT-001"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_AUS_GOCE",
+          "sql": "AUS_CON_GOCE_SALARIO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "AUS_CON_GOCE_SALARIO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "state",
+        "field": "AUS_ESTADO",
+        "label": "Editar estado"
+      },
+      "labelFields": [
+        "EML_ID",
+        "AUS_FECHA_INICIO"
+      ]
+    },
+    {
+      "name": "NOM_VACACION",
+      "pk": "VAC_ID",
+      "slug": "vacacion",
+      "title": "Vacaciones",
+      "group": "asistencia",
+      "fields": [
+        {
+          "name": "VAC_ID",
+          "label": "Vacaciones",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_VAC_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "VAC_FECHA_INICIO",
+          "label": "Fecha inicio",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "VAC_FECHA_FIN",
+          "label": "Fecha fin",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "VAC_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "SOLICITADA",
+            "APROBADA",
+            "GOZADA",
+            "ANULADA"
+          ],
+          "boolean": false,
+          "example": "SOLICITADA"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_VAC_ESTADO",
+          "sql": "VAC_ESTADO IN('SOLICITADA','APROBADA','GOZADA','ANULADA')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "VAC_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "SOLICITADA"
+              },
+              {
+                "literal": "APROBADA"
+              },
+              {
+                "literal": "GOZADA"
+              },
+              {
+                "literal": "ANULADA"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_VAC_FECHAS",
+          "sql": "VAC_FECHA_FIN>=VAC_FECHA_INICIO",
+          "ast": {
+            "op": ">=",
+            "left": {
+              "field": "VAC_FECHA_FIN"
+            },
+            "right": {
+              "field": "VAC_FECHA_INICIO"
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "cancel",
+        "field": "VAC_ESTADO",
+        "value": "ANULADA",
+        "label": "Anular"
+      },
+      "labelFields": [
+        "EML_ID",
+        "VAC_FECHA_INICIO"
+      ]
+    },
+    {
+      "name": "NOM_MOVIMIENTO",
+      "pk": "NMO_ID",
+      "slug": "movimiento",
+      "title": "Movimientos",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "NMO_ID",
+          "label": "Movimiento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_NMO_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PERIODO",
+            "pk": "NPE_ID",
+            "constraint": "FK_NMO_NPE"
+          },
+          "boolean": false,
+          "example": "Busca período"
+        },
+        {
+          "name": "NMO_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "options": [
+            "PRESTAMO",
+            "DESCUENTO",
+            "TIENDA",
+            "HORA_EXTRA",
+            "VACACION",
+            "PERMISO",
+            "SUSPENSION",
+            "COMISION",
+            "LIQUIDACION"
+          ],
+          "boolean": false,
+          "example": "PRESTAMO"
+        },
+        {
+          "name": "NMO_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "NMO_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NMO_CANTIDAD_HORAS",
+          "label": "Cantidad horas",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 10,
+          "scale": 2,
+          "boolean": false,
+          "example": "8.50"
+        },
+        {
+          "name": "NMO_DESCRIPCION",
+          "label": "Descripción",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 300,
+          "boolean": false,
+          "example": "Ajuste correspondiente al período"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NMO_TIPO",
+          "sql": "NMO_TIPO IN ('PRESTAMO','DESCUENTO','TIENDA','HORA_EXTRA',\n                         'VACACION','PERMISO','SUSPENSION','COMISION','LIQUIDACION')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NMO_TIPO"
+            },
+            "values": [
+              {
+                "literal": "PRESTAMO"
+              },
+              {
+                "literal": "DESCUENTO"
+              },
+              {
+                "literal": "TIENDA"
+              },
+              {
+                "literal": "HORA_EXTRA"
+              },
+              {
+                "literal": "VACACION"
+              },
+              {
+                "literal": "PERMISO"
+              },
+              {
+                "literal": "SUSPENSION"
+              },
+              {
+                "literal": "COMISION"
+              },
+              {
+                "literal": "LIQUIDACION"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "EML_ID",
+        "NMO_TIPO",
+        "NMO_FECHA"
+      ]
+    },
+    {
+      "name": "NOM_DESCUENTO_APLICADO",
+      "pk": "DAP_ID",
+      "slug": "descuento-aplicado",
+      "title": "Descuentos aplicados",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "DAP_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_DAP_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "TDE_ID",
+          "label": "Tipo de descuento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIPO_DESCUENTO",
+            "pk": "TDE_ID",
+            "constraint": "FK_DAP_TDE"
+          },
+          "boolean": false,
+          "example": "Busca tipo de descuento"
+        },
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PERIODO",
+            "pk": "NPE_ID",
+            "constraint": "FK_DAP_NPE"
+          },
+          "boolean": false,
+          "example": "Busca período"
+        },
+        {
+          "name": "DAP_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": true,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "DAP_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "default": "PENDIENTE",
+          "options": [
+            "PENDIENTE",
+            "APLICADO",
+            "ANULADO"
+          ],
+          "boolean": false,
+          "example": "PENDIENTE"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_DAP_ESTADO",
+          "sql": "DAP_ESTADO IN ('PENDIENTE','APLICADO','ANULADO')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "DAP_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "PENDIENTE"
+              },
+              {
+                "literal": "APLICADO"
+              },
+              {
+                "literal": "ANULADO"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_DAP_MONTO",
+          "sql": "DAP_MONTO > 0",
+          "ast": {
+            "op": ">",
+            "left": {
+              "field": "DAP_MONTO"
+            },
+            "right": {
+              "literal": "0"
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "cancel",
+        "field": "DAP_ESTADO",
+        "value": "ANULADO",
+        "label": "Anular"
+      },
+      "labelFields": [
+        "EML_ID",
+        "TDE_ID",
+        "NPE_ID"
+      ]
+    },
+    {
+      "name": "NOM_PRESTAMO",
+      "pk": "NPR_ID",
+      "slug": "prestamo",
+      "title": "Préstamos y anticipos",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "NPR_ID",
+          "label": "Préstamo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_NPR_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "NPR_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "NPR_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NPR_CUOTAS",
+          "label": "Cuotas",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 3,
+          "scale": 0,
+          "boolean": false,
+          "example": "6"
+        },
+        {
+          "name": "NPR_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "Estado acordado por tu organización"
+        },
+        {
+          "name": "NPR_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 30,
+          "default": "PRESTAMO",
+          "options": [
+            "PRESTAMO",
+            "ANTICIPO",
+            "DESCUENTO_VEHICULO",
+            "OTRO"
+          ],
+          "boolean": false,
+          "example": "PRESTAMO"
+        },
+        {
+          "name": "NPR_OBSERVACION",
+          "label": "Observación",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 500,
+          "boolean": false,
+          "example": "Detalle adicional para Recursos Humanos"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_NPR_TIPO",
+          "sql": "NPR_TIPO IN ('PRESTAMO','ANTICIPO','DESCUENTO_VEHICULO','OTRO')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NPR_TIPO"
+            },
+            "values": [
+              {
+                "literal": "PRESTAMO"
+              },
+              {
+                "literal": "ANTICIPO"
+              },
+              {
+                "literal": "DESCUENTO_VEHICULO"
+              },
+              {
+                "literal": "OTRO"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "state",
+        "field": "NPR_ESTADO",
+        "label": "Editar estado"
+      },
+      "labelFields": [
+        "EML_ID",
+        "NPR_TIPO",
+        "NPR_FECHA"
+      ]
+    },
+    {
+      "name": "NOM_PRESTAMO_CUOTA",
+      "pk": "NPC_ID",
+      "slug": "prestamo-cuota",
+      "title": "Cuotas de préstamos",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "NPC_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NPR_ID",
+          "label": "Préstamo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PRESTAMO",
+            "pk": "NPR_ID",
+            "constraint": "FK_NPC_NPR"
+          },
+          "boolean": false,
+          "example": "Busca préstamo"
+        },
+        {
+          "name": "NPC_NUMERO",
+          "label": "Número",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 3,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NPC_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "NPC_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        }
+      ],
+      "checks": [],
+      "unique": [
+        {
+          "name": "UQ_NOM_PRESTAMO_CUOTA",
+          "fields": [
+            "NPR_ID",
+            "NPC_NUMERO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "NPC_ID"
+      ]
+    },
+    {
+      "name": "NOM_TIENDA_PRODUCTO",
+      "pk": "TDP_ID",
+      "slug": "tienda-producto",
+      "title": "Productos de tienda",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "TDP_ID",
+          "label": "Producto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_NOM_TDP_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "TDP_CODIGO",
+          "label": "Código",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "boolean": false,
+          "example": "PROD-001"
+        },
+        {
+          "name": "TDP_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "Café"
+        },
+        {
+          "name": "TDP_PRECIO",
+          "label": "Precio",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "TDP_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_TDP_ACTIVO",
+          "sql": "TDP_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "TDP_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_TDP_PRECIO",
+          "sql": "TDP_PRECIO >= 0",
+          "ast": {
+            "op": ">=",
+            "left": {
+              "field": "TDP_PRECIO"
+            },
+            "right": {
+              "literal": "0"
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_TDP_CODIGO",
+          "fields": [
+            "EMP_ID",
+            "TDP_CODIGO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "TDP_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "TDP_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_TIENDA_CONSUMO",
+      "pk": "CTD_ID",
+      "slug": "tienda-consumo",
+      "title": "Consumos de tienda",
+      "group": "movimientos",
+      "fields": [
+        {
+          "name": "CTD_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_CTD_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "TDP_ID",
+          "label": "Producto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIENDA_PRODUCTO",
+            "pk": "TDP_ID",
+            "constraint": "FK_CTD_TDP"
+          },
+          "boolean": false,
+          "example": "Busca producto"
+        },
+        {
+          "name": "NMO_ID",
+          "label": "Movimiento",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_MOVIMIENTO",
+            "pk": "NMO_ID",
+            "constraint": "FK_CTD_NMO"
+          },
+          "boolean": false,
+          "example": "Busca movimiento"
+        },
+        {
+          "name": "CTD_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "CTD_CANTIDAD",
+          "label": "Cantidad",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 10,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": true,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "CTD_PRECIO_UNITARIO",
+          "label": "Precio unitario",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "CTD_SUBTOTAL",
+          "label": "Subtotal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "CTD_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "PENDIENTE",
+            "DESCONTADO",
+            "ANULADO"
+          ],
+          "boolean": false,
+          "example": "PENDIENTE"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_CTD_ESTADO",
+          "sql": "CTD_ESTADO IN ('PENDIENTE','DESCONTADO','ANULADO')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "CTD_ESTADO"
+            },
+            "values": [
+              {
+                "literal": "PENDIENTE"
+              },
+              {
+                "literal": "DESCONTADO"
+              },
+              {
+                "literal": "ANULADO"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_CTD_VALORES",
+          "sql": "CTD_CANTIDAD > 0 AND CTD_PRECIO_UNITARIO >= 0 AND CTD_SUBTOTAL >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": "and",
+              "left": {
+                "op": ">",
+                "left": {
+                  "field": "CTD_CANTIDAD"
+                },
+                "right": {
+                  "literal": "0"
+                }
+              },
+              "right": {
+                "op": ">=",
+                "left": {
+                  "field": "CTD_PRECIO_UNITARIO"
+                },
+                "right": {
+                  "literal": "0"
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "CTD_SUBTOTAL"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "cancel",
+        "field": "CTD_ESTADO",
+        "value": "ANULADO",
+        "label": "Anular"
+      },
+      "labelFields": [
+        "CTD_ESTADO"
+      ]
+    },
+    {
+      "name": "NOM_INGRESO_VARIABLE",
+      "pk": "INV_ID",
+      "slug": "ingreso-variable",
+      "title": "Ingresos variables",
+      "group": "ingresos",
+      "description": "Registra comisiones, bonos u otros ingresos. La base y el porcentaje son opcionales.",
+      "fields": [
+        {
+          "name": "INV_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_INV_RLA"
+          },
+          "boolean": false,
+          "example": "Busca relación laboral"
+        },
+        {
+          "name": "NPE_ID",
+          "label": "Período",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_PERIODO",
+            "pk": "NPE_ID",
+            "constraint": "FK_NOM_INV_NPE"
+          },
+          "boolean": false,
+          "example": "Busca período"
+        },
+        {
+          "name": "TIN_ID",
+          "label": "Tipo de ingreso",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_TIPO_INGRESO",
+            "pk": "TIN_ID",
+            "constraint": "FK_NOM_INV_TIN"
+          },
+          "boolean": false,
+          "example": "Busca tipo de ingreso"
+        },
+        {
+          "name": "DTE_ID",
+          "label": "Documento tributario",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "CXC_DTE",
+            "pk": "DTE_ID",
+            "constraint": "FK_NOM_INV_DTE"
+          },
+          "boolean": false,
+          "example": "Busca documento tributario"
+        },
+        {
+          "name": "INV_REFERENCIA",
+          "label": "Referencia",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "VENTA-001"
+        },
+        {
+          "name": "INV_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "INV_BASE",
+          "label": "Base",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "hint": "Base opcional para el ingreso; si se indica, debe ser igual o mayor que cero.",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "INV_PORCENTAJE",
+          "label": "Porcentaje",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 9,
+          "scale": 6,
+          "hint": "Porcentaje opcional; hasta seis decimales, igual o mayor que cero.",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "5"
+        },
+        {
+          "name": "INV_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "INV_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "options": [
+            "PENDIENTE",
+            "APROBADA",
+            "PAGADA",
+            "ANULADA"
+          ],
+          "boolean": false,
+          "example": "PENDIENTE"
+        },
+        {
+          "name": "INV_OBSERVACION",
+          "label": "Observación",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 500,
+          "boolean": false,
+          "example": "Detalle adicional para Recursos Humanos"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_INV_ESTADO",
+          "sql": "INV_ESTADO='PENDIENTE' OR INV_ESTADO='APROBADA' OR INV_ESTADO='PAGADA' OR INV_ESTADO='ANULADA'",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "or",
+              "left": {
+                "op": "or",
+                "left": {
+                  "op": "=",
+                  "left": {
+                    "field": "INV_ESTADO"
+                  },
+                  "right": {
+                    "literal": "PENDIENTE"
+                  }
+                },
+                "right": {
+                  "op": "=",
+                  "left": {
+                    "field": "INV_ESTADO"
+                  },
+                  "right": {
+                    "literal": "APROBADA"
+                  }
+                }
+              },
+              "right": {
+                "op": "=",
+                "left": {
+                  "field": "INV_ESTADO"
+                },
+                "right": {
+                  "literal": "PAGADA"
+                }
+              }
+            },
+            "right": {
+              "op": "=",
+              "left": {
+                "field": "INV_ESTADO"
+              },
+              "right": {
+                "literal": "ANULADA"
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_INV_VALORES",
+          "sql": "(INV_BASE IS NULL OR INV_BASE >= 0)\n       AND (INV_PORCENTAJE IS NULL OR INV_PORCENTAJE >= 0)\n       AND INV_MONTO >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": "and",
+              "left": {
+                "op": "or",
+                "left": {
+                  "op": "null",
+                  "left": {
+                    "field": "INV_BASE"
+                  }
+                },
+                "right": {
+                  "op": ">=",
+                  "left": {
+                    "field": "INV_BASE"
+                  },
+                  "right": {
+                    "literal": "0"
+                  }
+                }
+              },
+              "right": {
+                "op": "or",
+                "left": {
+                  "op": "null",
+                  "left": {
+                    "field": "INV_PORCENTAJE"
+                  }
+                },
+                "right": {
+                  "op": ">=",
+                  "left": {
+                    "field": "INV_PORCENTAJE"
+                  },
+                  "right": {
+                    "literal": "0"
+                  }
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "INV_MONTO"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "cancel",
+        "field": "INV_ESTADO",
+        "value": "ANULADA",
+        "label": "Anular"
+      },
+      "labelFields": [
+        "RLA_ID",
+        "INV_FECHA",
+        "INV_REFERENCIA"
+      ]
+    },
+    {
+      "name": "NOM_LIQUIDACION_LABORAL",
+      "pk": "LIL_ID",
+      "slug": "liquidacion-laboral",
+      "title": "Liquidaciones laborales",
+      "group": "liquidacion",
+      "fields": [
+        {
+          "name": "LIL_ID",
+          "label": "Liquidación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EML_ID",
+          "label": "Empleado",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_EMPLEADO",
+            "pk": "EML_ID",
+            "constraint": "FK_LIL_EML"
+          },
+          "boolean": false,
+          "example": "Busca empleado"
+        },
+        {
+          "name": "LIL_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "LIL_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "LIL_MOTIVO",
+          "label": "Motivo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 300,
+          "boolean": false,
+          "example": "Finalización de la relación laboral"
+        },
+        {
+          "name": "RLA_ID",
+          "label": "Relación laboral",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_RELACION_LABORAL",
+            "pk": "RLA_ID",
+            "constraint": "FK_NOM_LIL_RLA"
+          },
+          "boolean": false,
+          "example": "Busca relación laboral"
+        },
+        {
+          "name": "MBA_ID",
+          "label": "Motivo de baja",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_MOTIVO_BAJA",
+            "pk": "MBA_ID",
+            "constraint": "FK_NOM_LIL_MBA"
+          },
+          "boolean": false,
+          "example": "Busca motivo de baja"
+        },
+        {
+          "name": "LIL_SALARIO_PROMEDIO",
+          "label": "Salario promedio",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "LIL_FECHA_FIRMA",
+          "label": "Fecha firma",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "DTE_ID",
+          "label": "Documento tributario",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "CXC_DTE",
+            "pk": "DTE_ID",
+            "constraint": "FK_NOM_LIL_DTE"
+          },
+          "boolean": false,
+          "example": "Busca documento tributario"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_LIL_PROMEDIO",
+          "sql": "LIL_SALARIO_PROMEDIO IS NULL OR LIL_SALARIO_PROMEDIO >= 0",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "LIL_SALARIO_PROMEDIO"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "LIL_SALARIO_PROMEDIO"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "EML_ID",
+        "LIL_FECHA"
+      ]
+    },
+    {
+      "name": "NOM_LIQUIDACION_DETALLE",
+      "pk": "LLD_ID",
+      "slug": "liquidacion-detalle",
+      "title": "Detalle de liquidaciones",
+      "group": "liquidacion",
+      "fields": [
+        {
+          "name": "LLD_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "LIL_ID",
+          "label": "Liquidación laboral",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_LIQUIDACION_LABORAL",
+            "pk": "LIL_ID",
+            "constraint": "FK_NOM_LLD_LIL"
+          },
+          "boolean": false,
+          "example": "Busca liquidación laboral"
+        },
+        {
+          "name": "NCO_ID",
+          "label": "Concepto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_CONCEPTO",
+            "pk": "NCO_ID",
+            "constraint": "FK_NOM_LLD_NCO"
+          },
+          "boolean": false,
+          "example": "Busca concepto"
+        },
+        {
+          "name": "LLD_FECHA_DESDE",
+          "label": "Fecha desde",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "LLD_FECHA_HASTA",
+          "label": "Fecha hasta",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "LLD_DIAS",
+          "label": "Días",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 8,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "LLD_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_LLD_FECHAS",
+          "sql": "LLD_FECHA_HASTA IS NULL OR LLD_FECHA_DESDE IS NULL OR LLD_FECHA_HASTA >= LLD_FECHA_DESDE",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "or",
+              "left": {
+                "op": "null",
+                "left": {
+                  "field": "LLD_FECHA_HASTA"
+                }
+              },
+              "right": {
+                "op": "null",
+                "left": {
+                  "field": "LLD_FECHA_DESDE"
+                }
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "LLD_FECHA_HASTA"
+              },
+              "right": {
+                "field": "LLD_FECHA_DESDE"
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_LLD_VALORES",
+          "sql": "LLD_DIAS >= 0 AND LLD_MONTO >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": ">=",
+              "left": {
+                "field": "LLD_DIAS"
+              },
+              "right": {
+                "literal": "0"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "LLD_MONTO"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_LLD_CONCEPTO",
+          "fields": [
+            "LIL_ID",
+            "NCO_ID"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "LLD_ID"
+      ]
+    },
+    {
+      "name": "NOM_TRANSFERENCIA_PAGO",
+      "pk": "TRP_ID",
+      "slug": "transferencia-pago",
+      "title": "Transferencias de pago",
+      "group": "liquidacion",
+      "description": "Registra el pago de un detalle de planilla y su cuenta bancaria.",
+      "fields": [
+        {
+          "name": "TRP_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "NOD_ID",
+          "label": "Detalle de planilla",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_NOMINA_DETALLE",
+            "pk": "NOD_ID",
+            "constraint": "FK_TRP_NOD"
+          },
+          "boolean": false,
+          "example": "Busca detalle de planilla"
+        },
+        {
+          "name": "CBE_ID",
+          "label": "Cuenta bancaria",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "NOM_CUENTA_BANCARIA_EMPLEADO",
+            "pk": "CBE_ID",
+            "constraint": "FK_TRP_CBE"
+          },
+          "boolean": false,
+          "example": "Busca cuenta bancaria"
+        },
+        {
+          "name": "TRP_FECHA",
+          "label": "Fecha",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "TRP_MONTO",
+          "label": "Monto",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": true,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "TRP_REFERENCIA",
+          "label": "Referencia",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 80,
+          "boolean": false,
+          "example": "Referencia de la operación bancaria"
+        },
+        {
+          "name": "TRP_ESTADO",
+          "label": "Estado",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "Estado acordado por tu organización"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_TRP_MONTO",
+          "sql": "TRP_MONTO>0",
+          "ast": {
+            "op": ">",
+            "left": {
+              "field": "TRP_MONTO"
+            },
+            "right": {
+              "literal": "0"
+            }
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "state",
+        "field": "TRP_ESTADO",
+        "label": "Editar estado"
+      },
+      "labelFields": [
+        "TRP_REFERENCIA"
+      ]
+    },
+    {
+      "name": "NOM_PARAMETRO_LABORAL",
+      "pk": "NPL_ID",
+      "slug": "parametro-laboral",
+      "title": "Parámetros laborales",
+      "group": "parametros",
+      "fields": [
+        {
+          "name": "NPL_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_NOM_NPL_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "NPL_CODIGO",
+          "label": "Código",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "FACTOR_HORA_EXTRA"
+        },
+        {
+          "name": "NPL_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "Factor de hora extra ordinaria"
+        },
+        {
+          "name": "NPL_VALOR",
+          "label": "Valor",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 6,
+          "boolean": false,
+          "example": "1.5"
+        },
+        {
+          "name": "NPL_FECHA_DESDE",
+          "label": "Fecha desde",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "NPL_FECHA_HASTA",
+          "label": "Fecha hasta",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "NPL_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_NPL_ACTIVO",
+          "sql": "NPL_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "NPL_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_NPL_FECHAS",
+          "sql": "NPL_FECHA_HASTA IS NULL OR NPL_FECHA_HASTA >= NPL_FECHA_DESDE",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "NPL_FECHA_HASTA"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "NPL_FECHA_HASTA"
+              },
+              "right": {
+                "field": "NPL_FECHA_DESDE"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_NPL_VIGENCIA",
+          "fields": [
+            "EMP_ID",
+            "NPL_CODIGO",
+            "NPL_FECHA_DESDE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "NPL_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "NPL_NOMBRE"
+      ]
+    },
+    {
+      "name": "NOM_ISR_RANGO",
+      "pk": "ISR_ID",
+      "slug": "isr-rango",
+      "title": "Rangos de ISR",
+      "group": "parametros",
+      "fields": [
+        {
+          "name": "ISR_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_NOM_ISR_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "ISR_DESDE",
+          "label": "Desde",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "ISR_HASTA",
+          "label": "Hasta",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "ISR_CUOTA_FIJA",
+          "label": "Cuota fija",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 18,
+          "scale": 2,
+          "default": "0",
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "100.00"
+        },
+        {
+          "name": "ISR_PORCENTAJE",
+          "label": "Porcentaje",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 9,
+          "scale": 6,
+          "min": "0",
+          "exclusiveMin": false,
+          "boolean": false,
+          "example": "5"
+        },
+        {
+          "name": "ISR_FECHA_DESDE",
+          "label": "Fecha desde",
+          "type": "DATE",
+          "required": true,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "ISR_FECHA_HASTA",
+          "label": "Fecha hasta",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/09/2026"
+        },
+        {
+          "name": "ISR_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_NOM_ISR_ACTIVO",
+          "sql": "ISR_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "ISR_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_NOM_ISR_FECHAS",
+          "sql": "ISR_FECHA_HASTA IS NULL OR ISR_FECHA_HASTA >= ISR_FECHA_DESDE",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "null",
+              "left": {
+                "field": "ISR_FECHA_HASTA"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "ISR_FECHA_HASTA"
+              },
+              "right": {
+                "field": "ISR_FECHA_DESDE"
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_ISR_LIMITES",
+          "sql": "ISR_DESDE >= 0 AND (ISR_HASTA IS NULL OR ISR_HASTA >= ISR_DESDE)",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": ">=",
+              "left": {
+                "field": "ISR_DESDE"
+              },
+              "right": {
+                "literal": "0"
+              }
+            },
+            "right": {
+              "op": "or",
+              "left": {
+                "op": "null",
+                "left": {
+                  "field": "ISR_HASTA"
+                }
+              },
+              "right": {
+                "op": ">=",
+                "left": {
+                  "field": "ISR_HASTA"
+                },
+                "right": {
+                  "field": "ISR_DESDE"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_NOM_ISR_VALORES",
+          "sql": "ISR_CUOTA_FIJA >= 0 AND ISR_PORCENTAJE >= 0",
+          "ast": {
+            "op": "and",
+            "left": {
+              "op": ">=",
+              "left": {
+                "field": "ISR_CUOTA_FIJA"
+              },
+              "right": {
+                "literal": "0"
+              }
+            },
+            "right": {
+              "op": ">=",
+              "left": {
+                "field": "ISR_PORCENTAJE"
+              },
+              "right": {
+                "literal": "0"
+              }
+            }
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_NOM_ISR_RANGO",
+          "fields": [
+            "EMP_ID",
+            "ISR_DESDE",
+            "ISR_FECHA_DESDE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "ISR_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "ISR_ID"
+      ]
+    }
+  ],
+  "masters": [
+    {
+      "name": "ERP_PERSONA",
+      "pk": "PER_ID",
+      "slug": "erp-persona",
+      "title": "Personas",
+      "group": "personas",
+      "fields": [
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_TIPO",
+          "label": "Tipo de persona",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 1,
+          "options": [
+            "F",
+            "J"
+          ],
+          "boolean": false,
+          "example": "Persona física"
+        },
+        {
+          "name": "PER_NOMBRES",
+          "label": "Nombres",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "Ana María"
+        },
+        {
+          "name": "PER_APELLIDOS",
+          "label": "Apellidos",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "López García"
+        },
+        {
+          "name": "PER_RAZON_SOCIAL",
+          "label": "Razón social",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 200,
+          "boolean": false,
+          "example": "Servicios del Centro, S. A."
+        },
+        {
+          "name": "PER_NOMBRE_COMERCIAL",
+          "label": "Nombre comercial",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 200,
+          "boolean": false,
+          "example": "Servicios del Centro"
+        },
+        {
+          "name": "PER_FECHA_NACIMIENTO",
+          "label": "Fecha de nacimiento",
+          "type": "DATE",
+          "required": false,
+          "identity": false,
+          "boolean": false,
+          "example": "15/03/1990"
+        },
+        {
+          "name": "PER_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        },
+        {
+          "name": "PER_FECHA_CREA",
+          "label": "Fecha de creación",
+          "type": "TIMESTAMP",
+          "required": true,
+          "identity": false,
+          "default": "SYSTIMESTAMP",
+          "boolean": false,
+          "example": "Se asignará al guardar"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PER_ACTIVO",
+          "sql": "PER_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PER_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        },
+        {
+          "name": "CK_PER_NOMBRE",
+          "sql": "(PER_TIPO = 'F' AND PER_NOMBRES IS NOT NULL AND PER_APELLIDOS IS NOT NULL) OR (PER_TIPO = 'J' AND PER_RAZON_SOCIAL IS NOT NULL)",
+          "ast": {
+            "op": "or",
+            "left": {
+              "op": "and",
+              "left": {
+                "op": "and",
+                "left": {
+                  "op": "=",
+                  "left": {
+                    "field": "PER_TIPO"
+                  },
+                  "right": {
+                    "literal": "F"
+                  }
+                },
+                "right": {
+                  "op": "notNull",
+                  "left": {
+                    "field": "PER_NOMBRES"
+                  }
+                }
+              },
+              "right": {
+                "op": "notNull",
+                "left": {
+                  "field": "PER_APELLIDOS"
+                }
+              }
+            },
+            "right": {
+              "op": "and",
+              "left": {
+                "op": "=",
+                "left": {
+                  "field": "PER_TIPO"
+                },
+                "right": {
+                  "literal": "J"
+                }
+              },
+              "right": {
+                "op": "notNull",
+                "left": {
+                  "field": "PER_RAZON_SOCIAL"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "CK_PER_TIPO",
+          "sql": "PER_TIPO IN ('F','J')",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PER_TIPO"
+            },
+            "values": [
+              {
+                "literal": "F"
+              },
+              {
+                "literal": "J"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "PER_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "PER_NOMBRES",
+        "PER_APELLIDOS"
+      ],
+      "labelMode": "person"
+    },
+    {
+      "name": "ERP_PERSONA_DOCUMENTO",
+      "pk": "PDC_ID",
+      "slug": "erp-persona-documento",
+      "title": "Documentos de identidad",
+      "group": "personas",
+      "fields": [
+        {
+          "name": "PDC_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PERSONA",
+            "pk": "PER_ID",
+            "constraint": "FK_PDC_PER"
+          },
+          "boolean": false,
+          "example": "Busca persona"
+        },
+        {
+          "name": "TDI_ID",
+          "label": "Tipo de documento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_TIPO_DOCUMENTO_IDENTIDAD",
+            "pk": "TDI_ID",
+            "constraint": "FK_PDC_TDI"
+          },
+          "boolean": false,
+          "example": "Busca tipo de día"
+        },
+        {
+          "name": "PDC_NUMERO",
+          "label": "Número de documento",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "1234567890101"
+        },
+        {
+          "name": "PDC_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PDC_PRINCIPAL",
+          "sql": "PDC_PRINCIPAL IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PDC_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_PERSONA_DOCUMENTO",
+          "fields": [
+            "TDI_ID",
+            "PDC_NUMERO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "PER_ID",
+        "PDC_NUMERO"
+      ]
+    },
+    {
+      "name": "ERP_PERSONA_CORREO",
+      "pk": "PCO_ID",
+      "slug": "erp-persona-correo",
+      "title": "Correos de personas",
+      "group": "personas",
+      "fields": [
+        {
+          "name": "PCO_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PERSONA",
+            "pk": "PER_ID",
+            "constraint": "FK_PCO_PER"
+          },
+          "boolean": false,
+          "example": "Busca persona"
+        },
+        {
+          "name": "PCO_CORREO",
+          "label": "Correo electrónico",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 254,
+          "boolean": false,
+          "input": "email",
+          "example": "correo@dominio.com"
+        },
+        {
+          "name": "PCO_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PCO_PRINCIPAL",
+          "sql": "PCO_PRINCIPAL IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PCO_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_PERSONA_CORREO",
+          "fields": [
+            "PER_ID",
+            "PCO_CORREO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "PER_ID",
+        "PCO_CORREO"
+      ]
+    },
+    {
+      "name": "ERP_PERSONA_TELEFONO",
+      "pk": "PTE_ID",
+      "slug": "erp-persona-telefono",
+      "title": "Teléfonos de personas",
+      "group": "personas",
+      "fields": [
+        {
+          "name": "PTE_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PERSONA",
+            "pk": "PER_ID",
+            "constraint": "FK_PTE_PER"
+          },
+          "boolean": false,
+          "example": "Busca persona"
+        },
+        {
+          "name": "PTE_NUMERO",
+          "label": "Número de teléfono",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 30,
+          "boolean": false,
+          "input": "tel",
+          "example": "1234-5678"
+        },
+        {
+          "name": "PTE_TIPO",
+          "label": "Tipo",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "boolean": false,
+          "example": "PERSONAL"
+        },
+        {
+          "name": "PTE_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PTE_PRINCIPAL",
+          "sql": "PTE_PRINCIPAL IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PTE_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_PERSONA_TELEFONO",
+          "fields": [
+            "PER_ID",
+            "PTE_NUMERO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "PER_ID",
+        "PTE_NUMERO"
+      ]
+    },
+    {
+      "name": "ERP_PERSONA_DIRECCION",
+      "pk": "PDR_ID",
+      "slug": "erp-persona-direccion",
+      "title": "Direcciones de personas",
+      "group": "personas",
+      "fields": [
+        {
+          "name": "PDR_ID",
+          "label": "Id",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PER_ID",
+          "label": "Persona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PERSONA",
+            "pk": "PER_ID",
+            "constraint": "FK_PDR_PER"
+          },
+          "boolean": false,
+          "example": "Busca persona"
+        },
+        {
+          "name": "DIR_ID",
+          "label": "Dirección",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_DIRECCION",
+            "pk": "DIR_ID",
+            "constraint": "FK_PDR_DIR"
+          },
+          "boolean": false,
+          "example": "Busca dirección"
+        },
+        {
+          "name": "TDR_ID",
+          "label": "Tipo de dirección",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_TIPO_DIRECCION",
+            "pk": "TDR_ID",
+            "constraint": "FK_PDR_TDR"
+          },
+          "boolean": false,
+          "example": "Busca tipo de dirección"
+        },
+        {
+          "name": "PDR_PRINCIPAL",
+          "label": "Principal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "0",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Sí / no"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_PDR_PRINCIPAL",
+          "sql": "PDR_PRINCIPAL IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PDR_PRINCIPAL"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_PERSONA_DIRECCION",
+          "fields": [
+            "PER_ID",
+            "DIR_ID",
+            "TDR_ID"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "PER_ID",
+        "DIR_ID"
+      ]
+    },
+    {
+      "name": "ERP_EMPRESA",
+      "pk": "EMP_ID",
+      "slug": "erp-empresa",
+      "title": "Empresas",
+      "group": "organizacion",
+      "fields": [
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_RAZON_SOCIAL",
+          "label": "Razon social",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 200,
+          "boolean": false,
+          "example": "Empresa de ejemplo, S. A."
+        },
+        {
+          "name": "EMP_NOMBRE_COMERCIAL",
+          "label": "Nombre comercial",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 200,
+          "boolean": false,
+          "example": "Empresa de ejemplo"
+        },
+        {
+          "name": "EMP_NIT",
+          "label": "Nit",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 20,
+          "boolean": false,
+          "example": "1234567-8"
+        },
+        {
+          "name": "EMP_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        },
+        {
+          "name": "EMP_FECHA_CREA",
+          "label": "Fecha de creación",
+          "type": "TIMESTAMP",
+          "required": true,
+          "identity": false,
+          "default": "SYSTIMESTAMP",
+          "boolean": false,
+          "example": "Se asignará al guardar"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_ERP_EMPRESA_ACTIVO",
+          "sql": "EMP_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "EMP_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_EMPRESA_NIT",
+          "fields": [
+            "EMP_NIT"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "EMP_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "EMP_RAZON_SOCIAL"
+      ]
+    },
+    {
+      "name": "ERP_SUCURSAL",
+      "pk": "SUC_ID",
+      "slug": "erp-sucursal",
+      "title": "Sucursales",
+      "group": "organizacion",
+      "fields": [
+        {
+          "name": "SUC_ID",
+          "label": "Sucursal",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_SUC_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "DIR_ID",
+          "label": "Dirección",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_DIRECCION",
+            "pk": "DIR_ID",
+            "constraint": "FK_SUC_DIR"
+          },
+          "boolean": false,
+          "example": "Busca dirección"
+        },
+        {
+          "name": "SUC_CODIGO",
+          "label": "Código",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "SUC-001"
+        },
+        {
+          "name": "SUC_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 150,
+          "boolean": false,
+          "example": "Sede central"
+        },
+        {
+          "name": "SUC_ACTIVA",
+          "label": "Activa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_SUC_ACTIVA",
+          "sql": "SUC_ACTIVA IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "SUC_ACTIVA"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_SUCURSAL_CODIGO",
+          "fields": [
+            "EMP_ID",
+            "SUC_CODIGO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "SUC_ACTIVA",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "EMP_ID",
+        "SUC_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_DEPARTAMENTO",
+      "pk": "DPT_ID",
+      "slug": "erp-departamento",
+      "title": "Departamentos de trabajo",
+      "group": "organizacion",
+      "fields": [
+        {
+          "name": "DPT_ID",
+          "label": "Departamento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "EMP_ID",
+          "label": "Empresa",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_EMPRESA",
+            "pk": "EMP_ID",
+            "constraint": "FK_DPT_EMP"
+          },
+          "boolean": false,
+          "example": "Busca empresa"
+        },
+        {
+          "name": "DPT_CODIGO",
+          "label": "Código",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 15,
+          "boolean": false,
+          "example": "RRHH"
+        },
+        {
+          "name": "DPT_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Recursos Humanos"
+        },
+        {
+          "name": "DPT_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_DPT_ACTIVO",
+          "sql": "DPT_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "DPT_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_DEP_INTERNA_COD",
+          "fields": [
+            "EMP_ID",
+            "DPT_CODIGO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "DPT_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "EMP_ID",
+        "DPT_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_BANCO",
+      "pk": "BAN_ID",
+      "slug": "erp-banco",
+      "title": "Bancos",
+      "group": "organizacion",
+      "fields": [
+        {
+          "name": "BAN_ID",
+          "label": "Banco",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PAI_ID",
+          "label": "País",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PAIS",
+            "pk": "PAI_ID",
+            "constraint": "FK_BAN_PAI"
+          },
+          "boolean": false,
+          "example": "Busca país"
+        },
+        {
+          "name": "BAN_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Banco de ejemplo"
+        },
+        {
+          "name": "BAN_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [],
+      "unique": [
+        {
+          "name": "UQ_ERP_BANCO",
+          "fields": [
+            "BAN_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "BAN_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "BAN_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_TIPO_DOCUMENTO_IDENTIDAD",
+      "pk": "TDI_ID",
+      "slug": "erp-tipo-documento-identidad",
+      "title": "Tipos de documento de identidad",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "TDI_ID",
+          "label": "Tipo de día",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TDI_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 50,
+          "boolean": false,
+          "example": "DPI"
+        },
+        {
+          "name": "TDI_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_TDI_ACTIVO",
+          "sql": "TDI_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "TDI_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_TIPO_DOC_IDENTIDAD",
+          "fields": [
+            "TDI_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "TDI_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "TDI_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_TIPO_DIRECCION",
+      "pk": "TDR_ID",
+      "slug": "erp-tipo-direccion",
+      "title": "Tipos de dirección",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "TDR_ID",
+          "label": "Tipo de dirección",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "TDR_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 40,
+          "boolean": false,
+          "example": "Domicilio"
+        }
+      ],
+      "checks": [],
+      "unique": [
+        {
+          "name": "UQ_ERP_TIPO_DIRECCION",
+          "fields": [
+            "TDR_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "TDR_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_DIRECCION",
+      "pk": "DIR_ID",
+      "slug": "erp-direccion",
+      "title": "Direcciones",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "DIR_ID",
+          "label": "Dirección",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "ZON_ID",
+          "label": "Zona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_ZONA",
+            "pk": "ZON_ID",
+            "constraint": "FK_DIR_ZON"
+          },
+          "boolean": false,
+          "example": "Busca zona"
+        },
+        {
+          "name": "DIR_DETALLE",
+          "label": "Dirección completa",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 500,
+          "boolean": false,
+          "example": "5a avenida 10-20, zona 1"
+        },
+        {
+          "name": "DIR_REFERENCIA",
+          "label": "Referencia",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 500,
+          "boolean": false,
+          "example": "Frente al parque central"
+        },
+        {
+          "name": "DIR_LATITUD",
+          "label": "Latitud",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 10,
+          "scale": 7,
+          "boolean": false,
+          "example": "14.634915"
+        },
+        {
+          "name": "DIR_LONGITUD",
+          "label": "Longitud",
+          "type": "NUMBER",
+          "required": false,
+          "identity": false,
+          "precision": 10,
+          "scale": 7,
+          "boolean": false,
+          "example": "-90.506882"
+        }
+      ],
+      "checks": [],
+      "unique": [],
+      "lifecycle": {
+        "mode": "delete",
+        "label": "Eliminar"
+      },
+      "labelFields": [
+        "DIR_DETALLE",
+        "ZON_ID"
+      ]
+    },
+    {
+      "name": "ERP_ZONA",
+      "pk": "ZON_ID",
+      "slug": "erp-zona",
+      "title": "Zonas",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "ZON_ID",
+          "label": "Zona",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "MUN_ID",
+          "label": "Municipio",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_MUNICIPIO",
+            "pk": "MUN_ID",
+            "constraint": "FK_ZON_MUN"
+          },
+          "boolean": false,
+          "example": "Busca municipio"
+        },
+        {
+          "name": "ZON_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Zona 1"
+        },
+        {
+          "name": "ZON_CODIGO_POSTAL",
+          "label": "Código postal",
+          "type": "VARCHAR2",
+          "required": false,
+          "identity": false,
+          "maxLength": 12,
+          "boolean": false,
+          "example": "01001"
+        },
+        {
+          "name": "ZON_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_ZON_ACTIVO",
+          "sql": "ZON_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "ZON_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_ZONA",
+          "fields": [
+            "MUN_ID",
+            "ZON_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "ZON_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "MUN_ID",
+        "ZON_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_MUNICIPIO",
+      "pk": "MUN_ID",
+      "slug": "erp-municipio",
+      "title": "Municipios",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "MUN_ID",
+          "label": "Municipio",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "DPT_ID",
+          "label": "Departamento geográfico",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_DEPARTAMENTO_GEOGRAFICO",
+            "pk": "DPT_ID",
+            "constraint": "FK_MUN_DPT"
+          },
+          "boolean": false,
+          "example": "Busca departamento"
+        },
+        {
+          "name": "MUN_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Guatemala"
+        },
+        {
+          "name": "MUN_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_MUN_ACTIVO",
+          "sql": "MUN_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "MUN_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_MUNICIPIO",
+          "fields": [
+            "DPT_ID",
+            "MUN_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "MUN_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "DPT_ID",
+        "MUN_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_DEPARTAMENTO_GEOGRAFICO",
+      "pk": "DPT_ID",
+      "slug": "erp-departamento-geografico",
+      "title": "Departamentos geográficos",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "DPT_ID",
+          "label": "Departamento",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PAI_ID",
+          "label": "País",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 38,
+          "scale": 0,
+          "ref": {
+            "table": "ERP_PAIS",
+            "pk": "PAI_ID",
+            "constraint": "FK_DPT_PAI"
+          },
+          "boolean": false,
+          "example": "Busca país"
+        },
+        {
+          "name": "DPT_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Guatemala"
+        },
+        {
+          "name": "DPT_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_DPG_ACTIVO",
+          "sql": "DPT_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "DPT_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_DEPTO_GEO",
+          "fields": [
+            "PAI_ID",
+            "DPT_NOMBRE"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "DPT_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "PAI_ID",
+        "DPT_NOMBRE"
+      ]
+    },
+    {
+      "name": "ERP_PAIS",
+      "pk": "PAI_ID",
+      "slug": "erp-pais",
+      "title": "Países",
+      "group": "ubicaciones",
+      "fields": [
+        {
+          "name": "PAI_ID",
+          "label": "País",
+          "type": "NUMBER",
+          "required": true,
+          "identity": true,
+          "precision": 38,
+          "scale": 0,
+          "boolean": false,
+          "example": "1"
+        },
+        {
+          "name": "PAI_NOMBRE",
+          "label": "Nombre",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 100,
+          "boolean": false,
+          "example": "Guatemala"
+        },
+        {
+          "name": "PAI_CODIGO_ISO",
+          "label": "Código ISO (ej. GT)",
+          "type": "VARCHAR2",
+          "required": true,
+          "identity": false,
+          "maxLength": 3,
+          "boolean": false,
+          "example": "GT"
+        },
+        {
+          "name": "PAI_ACTIVO",
+          "label": "Activo",
+          "type": "NUMBER",
+          "required": true,
+          "identity": false,
+          "precision": 1,
+          "scale": 0,
+          "default": "1",
+          "options": [
+            "0",
+            "1"
+          ],
+          "boolean": true,
+          "example": "Activo / inactivo"
+        }
+      ],
+      "checks": [
+        {
+          "name": "CK_ERP_PAIS_ACTIVO",
+          "sql": "PAI_ACTIVO IN (0,1)",
+          "ast": {
+            "op": "in",
+            "left": {
+              "field": "PAI_ACTIVO"
+            },
+            "values": [
+              {
+                "literal": "0"
+              },
+              {
+                "literal": "1"
+              }
+            ]
+          }
+        }
+      ],
+      "unique": [
+        {
+          "name": "UQ_ERP_PAIS_ISO",
+          "fields": [
+            "PAI_CODIGO_ISO"
+          ]
+        }
+      ],
+      "lifecycle": {
+        "mode": "inactive",
+        "field": "PAI_ACTIVO",
+        "value": "0",
+        "label": "Inactivar"
+      },
+      "labelFields": [
+        "PAI_NOMBRE"
+      ]
+    }
+  ],
+  "externals": [
+    {
+      "name": "ERP_USUARIO",
+      "pk": "USU_ID",
+      "external": true,
+      "title": "ERP_USUARIO",
+      "labelFields": [
+        "USU_LOGIN"
+      ],
+      "fields": [
+        {
+          "name": "USU_ID",
+          "type": "NUMBER",
+          "precision": 38,
+          "scale": 0
+        },
+        {
+          "name": "USU_LOGIN",
+          "type": "VARCHAR2",
+          "maxLength": 80
+        }
+      ]
+    },
+    {
+      "name": "CXC_DTE",
+      "pk": "DTE_ID",
+      "external": true,
+      "title": "CXC_DTE",
+      "labelFields": [
+        "DTE_SERIE",
+        "DTE_NUMERO"
+      ],
+      "fields": [
+        {
+          "name": "DTE_ID",
+          "type": "NUMBER",
+          "precision": 38,
+          "scale": 0
+        },
+        {
+          "name": "DTE_SERIE",
+          "type": "VARCHAR2",
+          "maxLength": 30
+        },
+        {
+          "name": "DTE_NUMERO",
+          "type": "VARCHAR2",
+          "maxLength": 50
+        }
+      ]
+    }
+  ]
+}

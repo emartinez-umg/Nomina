@@ -1,0 +1,14 @@
+{
+  "tables": 194,
+  "nomina": 35,
+  "mode": "installed",
+  "backup": "backups/2026-09-11T18-02-31.964Z-pre-erp",
+  "sourceUser": "NOMINA",
+  "targetUser": "ERP_NOMINA",
+  "migratedSourceRows": 20,
+  "notes": [
+    "Salario ordinario conserva EML_SALARIO; bonificación de los datos de demostración = 0.",
+    "Se creó la relación laboral del empleado de ejemplo con su puesto, sucursal y fecha de ingreso originales.",
+    "Los datos fiscales y de ubicación añadidos son marcadores de desarrollo, no información real."
+  ]
+}

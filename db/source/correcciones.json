@@ -1,0 +1,74 @@
+[
+  {
+    "sourceLine": 641,
+    "reason": "Usar la definición final de integración contable en el primer CREATE."
+  },
+  {
+    "sourceLine": 642,
+    "reason": "Usar la definición final de integración contable en el primer CREATE."
+  },
+  {
+    "sourceLine": 665,
+    "reason": "Consolidar campos de partida en el bloque final (número de documento VARCHAR2 y USU_ID)."
+  },
+  {
+    "sourceLine": 1472,
+    "reason": "Las fechas y su CHECK se declaran en el bloque final, sin duplicados."
+  },
+  {
+    "sourceLine": 1478,
+    "reason": "Usar PCO_NOMBRE VARCHAR2(30) y CK_CON_PCO_NUM del bloque final."
+  },
+  {
+    "sourceLine": 1483,
+    "reason": "Usar naturaleza D/H del bloque final y sus columnas de jerarquía y flujo."
+  },
+  {
+    "sourceLine": 1491,
+    "reason": "No aplicar modificaciones del modelo legado DEBE/HABER a la definición final."
+  },
+  {
+    "sourceLine": 1492,
+    "reason": "No aplicar modificaciones del modelo legado DEBE/HABER a la definición final."
+  },
+  {
+    "sourceLine": 1500,
+    "reason": "Usar la definición final de integración contable en el primer CREATE."
+  },
+  {
+    "sourceLine": 1518,
+    "reason": "Consolidar campos de partida en el bloque final (número de documento VARCHAR2 y USU_ID)."
+  },
+  {
+    "sourceLine": 1529,
+    "reason": "CCS_ID y su FK ya existen; conservar solo línea, unicidad y validación nuevas."
+  },
+  {
+    "sourceLine": 1684,
+    "reason": "No aplicar modificaciones del modelo legado DEBE/HABER a la definición final."
+  },
+  {
+    "sourceLine": 1685,
+    "reason": "No aplicar modificaciones del modelo legado DEBE/HABER a la definición final."
+  },
+  {
+    "sourceLine": 1686,
+    "reason": "No aplicar modificaciones del modelo legado DEBE/HABER a la definición final."
+  },
+  {
+    "sourceLine": 1858,
+    "reason": "Eliminar CREATE duplicado; se consolidó con la definición de integración final."
+  },
+  {
+    "sourceLine": 1874,
+    "reason": "Eliminar CREATE duplicado; se consolidó con la definición de integración final."
+  },
+  {
+    "sourceLine": 1962,
+    "reason": "Eliminar CREATE duplicado; se consolidó con la definición de integración final."
+  },
+  {
+    "sourceLine": 2235,
+    "reason": "Acortar NPL_NOMBRE a menos de 150 bytes; conservar código, valor y vigencia originales."
+  }
+]

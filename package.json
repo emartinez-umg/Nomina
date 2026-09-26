@@ -1,0 +1,38 @@
+{
+  "name": "erp-nomina",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n API,WEB \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "schema": "node scripts/generate-schema.js",
+    "build": "npm run schema && npm run build -w frontend",
+    "test": "node --test tests/*.test.js",
+    "test:oracle": "node scripts/smoke-oracle.js",
+    "start": "npm start -w backend",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:prepare": "node scripts/prepare-erp.js",
+    "db:migrate:check": "node scripts/migrate-erp.js --check",
+    "db:migrate": "node scripts/migrate-erp.js --install",
+    "db:inspect": "node scripts/inspect-erp.js",
+    "db:seeds": "node scripts/generate-seeds.js",
+    "test:init": "node scripts/test-init.js",
+    "db:workflow": "node scripts/migrate-workflow.js",
+    "test:workflow": "node scripts/smoke-workflow.js"
+  },
+  "dependencies": {
+    "decimal.js": "^10.6.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "prettier": "^3.9.6",
+    "supertest": "^7.1.4"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

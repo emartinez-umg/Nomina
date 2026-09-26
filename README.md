@@ -44,3 +44,10 @@ Confiando en el profesionalismo y seriedad de los miembros del equipo, no existe
 ## 🔗 Ecosistema del Proyecto
 * 🛠️ **[Tablero de Jira (Sprints y Backlog)](#)** *[(Link)](https://miumg-as2.atlassian.net?continue=https%3A%2F%2Fmiumg-as2.atlassian.net%2Fwelcome%2Fsoftware&atlOrigin=eyJpIjoiMWEyZjZlY2U4NDUwNGM0YmE4NjExODJmNDViMmQyZDkiLCJwIjoiaiJ9)*
 * 📂 **[Carpeta Compartida de Google Drive](#)** *[(Link)](https://drive.google.com/drive/folders/1K9qbofvt7rKbA3K8m9ZU0ucBhU6a6iiB?usp=sharing)*
+
+
+## Módulo de Nómina y Recursos Humanos
+
+Implementación en React y Node.js con Oracle 21c: contratación, expedientes, jornadas, planillas y seguimiento de RR. HH. Las vacaciones acumulan 1.25 días por mes completo y se calculan según la jornada del empleado.
+
+Consulta la [instalación y comandos de Nómina](docs/nomina-README.md), la [guía de Recursos Humanos](docs/guia-recursos-humanos.md) y las [mejoras del flujo](docs/mejoras-ux-2026-09-25.md). El código ejecutable está en `backend/`, `frontend/`, `shared/`, `scripts/` y `db/`; se conservan las carpetas iniciales del equipo.
