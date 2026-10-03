@@ -1,3 +1,4 @@
+import { createUser } from '../backend/src/services/auth.js';
 // Isolated manual browser QA. Ctrl+C closes both servers and removes the disposable schema.
 import { installWorkflow } from '../backend/src/services/workflow-schema.js';
 import oracledb from 'oracledb';
@@ -46,8 +47,27 @@ try {
   await insertRows(c, demoData());
   await seedCatalogs(c);
   await installWorkflow(c);
+  const authentication = process.argv.includes('--auth');
+  if (authentication) {
+    const person = await c.execute(
+      "INSERT INTO ERP_PERSONA(PER_TIPO,PER_NOMBRES,PER_APELLIDOS) VALUES('F','Administrador','Vista de prueba') RETURNING PER_ID INTO :id",
+      { id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 80 } },
+    );
+    await createUser(c, {
+      login: 'qa.preview',
+      password: 'Nomina-Preview-2026!',
+      personId: String(person.outBinds.id[0]),
+      companyId: '1',
+      role: 'NOMINA_SISTEMA',
+    });
+    // UI fixture already completed onboarding. Password change is covered by test:workflow.
+    await c.execute(
+      "UPDATE NOM_USUARIO_PERFIL SET NUP_CAMBIO=0 WHERE NUP_USUARIO=(SELECT USU_ID FROM ERP_USUARIO WHERE USU_LOGIN='qa.preview')",
+    );
+    await c.commit();
+  }
   pool = await createPool({ ...process.env, NOM_DB_USER: user, NOM_DB_PASSWORD: password });
-  server = createApp({ pool }).listen(3002, '127.0.0.1');
+  server = createApp({ pool, authentication }).listen(3002, '127.0.0.1');
   vite = await createServer({
     root: fileURLToPath(new URL('../frontend', import.meta.url)),
     server: {

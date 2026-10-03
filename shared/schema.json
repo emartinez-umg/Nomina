@@ -695,9 +695,10 @@
           "type": "VARCHAR2",
           "required": true,
           "identity": false,
+          "generated": true,
           "maxLength": 20,
           "boolean": false,
-          "example": "EMP-001"
+          "example": "Se asigna al guardar"
         },
         {
           "name": "EML_IGSS",
@@ -1889,7 +1890,8 @@
             "ABIERTO",
             "CALCULADO",
             "PAGADO",
-            "CERRADO"
+            "CERRADO",
+            "ANULADO"
           ],
           "boolean": false,
           "example": "ABIERTO"
@@ -1994,7 +1996,7 @@
         },
         {
           "name": "CK_NPE_ESTADO",
-          "sql": "NPE_ESTADO IN('ABIERTO','CALCULADO','PAGADO','CERRADO')",
+          "sql": "NPE_ESTADO IN('ABIERTO','CALCULADO','PAGADO','CERRADO','ANULADO')",
           "ast": {
             "op": "in",
             "left": {
@@ -2012,6 +2014,9 @@
               },
               {
                 "literal": "CERRADO"
+              },
+              {
+                "literal": "ANULADO"
               }
             ]
           }
@@ -2028,9 +2033,10 @@
         }
       ],
       "lifecycle": {
-        "mode": "state",
+        "mode": "cancel",
         "field": "NPE_ESTADO",
-        "label": "Editar estado"
+        "value": "ANULADO",
+        "label": "Anular"
       },
       "labelFields": [
         "NPE_ANIO",
@@ -5714,7 +5720,7 @@
           "identity": false,
           "maxLength": 20,
           "boolean": false,
-          "example": "1234567-8"
+          "example": "1234567-9"
         },
         {
           "name": "EMP_ACTIVO",

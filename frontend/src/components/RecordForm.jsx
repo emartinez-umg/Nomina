@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthGate';
 import { useEffect, useState, useRef } from 'react';
 import { useWorkspace } from '../state/WorkspaceContext';
 import { Save } from 'lucide-react';
@@ -18,7 +19,8 @@ export function RecordForm({
   initialValues = {},
 }) {
   const workspace = useWorkspace();
-  const draftKey = `record:${table.name}:${row?.[table.pk] || JSON.stringify(initialValues)}`;
+  const auth = useAuth();
+  const draftKey = `record:${workspace.company}:${table.name}:${row?.[table.pk] || JSON.stringify(initialValues)}`;
   const recovered = useRef(!readOnly && workspace?.drafts.get(draftKey));
   const [dirty, setDirty] = useState(!!recovered.current);
   const [reason, setReason] = useState(recovered.current?.reason || '');
@@ -33,7 +35,10 @@ export function RecordForm({
         Object.fromEntries(
           fields.map((f) => [
             f.name,
-            row?.[f.name] ??
+            (f.name === 'USU_ID_CREA' && !row && !auth?.user.localMode
+              ? auth?.user.id
+              : undefined) ??
+              row?.[f.name] ??
               initialValues[f.name] ??
               initialDefaults[table.name]?.[f.name] ??
               (f.default === 'SYSTIMESTAMP' ? '' : f.default) ??
@@ -45,7 +50,18 @@ export function RecordForm({
     [saving, setSaving] = useState(false);
   const editing = !!row;
   useEffect(() => {
-    if (dirty && !readOnly) workspace?.keepDraft(draftKey, { values, reason, effectiveDate });
+    if (dirty && !readOnly)
+      workspace?.keepDraft(draftKey, {
+        company: workspace.company,
+        values,
+        reason,
+        effectiveDate,
+        version: recovered.current?.version || row?.__version,
+        route: table.slug,
+        recordId: row?.[table.pk],
+        initialValues,
+        label: `${editing ? 'Editar' : 'Agregar'} · ${table.title}`,
+      });
   }, [values, reason, effectiveDate, dirty, readOnly, draftKey, workspace?.keepDraft]);
   function close() {
     if (dirty) toast.info('Borrador conservado. Abre este formulario para continuar.');
@@ -102,7 +118,13 @@ export function RecordForm({
         method: editing ? 'PUT' : 'POST',
         body: JSON.stringify(result.data),
         headers: editing
-          ? { 'X-Change-Reason': encodeURIComponent(reason), 'X-Effective-Date': effectiveDate }
+          ? {
+              'X-Change-Reason': encodeURIComponent(reason),
+              'X-Effective-Date': effectiveDate,
+              ...(recovered.current?.version || row.__version
+                ? { 'If-Match': recovered.current?.version || row.__version }
+                : {}),
+            }
           : {},
       });
       workspace?.clearDraft(draftKey);
@@ -149,10 +171,41 @@ export function RecordForm({
                 {errors._form}
               </p>
             )}
+            {dirty && (
+              <p role="status" className="notice">
+                {workspace?.draftStatus}
+              </p>
+            )}
             {recovered.current && (
               <p className="notice">
-                Retomaste un borrador de esta sesión. Revisa los datos antes de guardarlos.
+                Retomaste un borrador guardado en este navegador. Revisa los datos antes de
+                guardarlos.
               </p>
+            )}
+            {table.name === 'NOM_PERIODO' && !editing && !readOnly && (
+              <Button
+                type="button"
+                variant="outline"
+                className="mb-4"
+                onClick={async () => {
+                  try {
+                    const suggestion = await api(
+                      '/personal/siguiente-periodo?' +
+                        new URLSearchParams({
+                          type: values.NPE_TIPO || '',
+                          fortnight: values.NPE_QUINCENA ? '1' : '0',
+                        }),
+                    );
+                    setValues((v) => ({ ...v, ...suggestion }));
+                    setDirty(true);
+                    setErrors({});
+                  } catch (e) {
+                    setErrors({ _form: e.message });
+                  }
+                }}
+              >
+                Sugerir siguiente período
+              </Button>
             )}
             <FormFields
               table={table}

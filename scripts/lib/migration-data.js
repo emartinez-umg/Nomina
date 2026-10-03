@@ -273,7 +273,7 @@ export async function seedCatalogs(c) {
 export async function validateInstalled(c, expectedRows = {}) {
   const count = (
     await c.execute(
-      "SELECT COUNT(*) FROM USER_TABLES WHERE TABLE_NAME NOT IN ('NOM_RH_EVENTO','NOM_RH_REVISION','NOM_RH_VACACION','NOM_RH_PAGO_LIQ')",
+      "SELECT COUNT(*) FROM USER_TABLES WHERE TABLE_NAME NOT IN ('NOM_RH_EVENTO','NOM_RH_REVISION','NOM_RH_VACACION','NOM_RH_PAGO_LIQ','NOM_CORRELATIVO','NOM_USUARIO_PERFIL','NOM_SESION','NOM_RECOMENDACION','NOM_ASUETO')",
     )
   ).rows[0][0];
   if (count !== targetModel.length)

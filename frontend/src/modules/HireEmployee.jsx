@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthGate';
 import { useEffect, useState, useRef } from 'react';
 import { CheckCircle2, ArrowLeft, ArrowRight, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -29,9 +30,11 @@ const localDate = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
 export function HireEmployee({ api, go }) {
+  const recommendationId = new URLSearchParams(location.search).get('recomendacion') || '';
   const initialPerson = new URLSearchParams(location.search).get('persona') || '';
   const workspace = useWorkspace();
-  const draftKey = `hire:${initialPerson}`;
+  const auth = useAuth();
+  const draftKey = `hire:${workspace.company}:${initialPerson}:${recommendationId}`;
   const draft = useRef(workspace?.drafts.get(draftKey)).current;
   const [step, setStep] = useState(draft?.step || 0),
     [mode, setMode] = useState(draft?.mode || (initialPerson ? 'existing' : 'new')),
@@ -54,7 +57,11 @@ export function HireEmployee({ api, go }) {
       },
     ),
     [relation, setRelation] = useState(
-      draft?.relation || { RLA_FECHA_INGRESO: localDate(), RLA_ESTADO: 'ACTIVA' },
+      draft?.relation || {
+        RLA_FECHA_INGRESO: localDate(),
+        RLA_ESTADO: 'ACTIVA',
+        ...(!auth?.user.localMode ? { USU_ID_CREA: auth?.user.id } : {}),
+      },
     ),
     [email, setEmail] = useState(draft?.email || ''),
     [phone, setPhone] = useState(draft?.phone || ''),
@@ -76,6 +83,14 @@ export function HireEmployee({ api, go }) {
         employee.EML_CODIGO)
     )
       workspace?.keepDraft(draftKey, {
+        company: workspace.company,
+        route: 'alta-empleado',
+        label: 'Contratación de empleado',
+        params: recommendationId
+          ? { recomendacion: recommendationId }
+          : initialPerson
+            ? { persona: initialPerson }
+            : {},
         step,
         mode,
         personId,
@@ -98,6 +113,32 @@ export function HireEmployee({ api, go }) {
     draftKey,
     workspace?.keepDraft,
   ]);
+  useEffect(() => {
+    if (!recommendationId || draft) return;
+    let live = true;
+    api('/personal/recomendaciones')
+      .then((rows) => {
+        const referral = rows.find((r) => r.NRE_ID === recommendationId);
+        if (!referral) throw new Error('No se encontró la recomendación en esta empresa.');
+        if (live) {
+          const parts = referral.NRE_NOMBRE.trim().split(/\s+/);
+          setPerson((v) => ({
+            ...v,
+            PER_NOMBRES: parts.length > 1 ? parts.slice(0, -1).join(' ') : parts[0],
+            PER_APELLIDOS: parts.length > 1 ? parts.at(-1) : '',
+          }));
+          setEmail(referral.NRE_CORREO || '');
+          setPhone(referral.NRE_TELEFONO || '');
+          setRelation((v) => ({ ...v, PUE_ID: referral.NRE_PUESTO }));
+        }
+      })
+      .catch((e) => {
+        if (live) setErrors({ _form: e.message });
+      });
+    return () => {
+      live = false;
+    };
+  }, [api, recommendationId]);
   useEffect(() => {
     let live = true;
     setSelected(null);
@@ -192,6 +233,7 @@ export function HireEmployee({ api, go }) {
       const r = await api('/hr/contrataciones', {
         method: 'POST',
         body: JSON.stringify({
+          ...(recommendationId ? { recommendationId } : {}),
           ...(mode === 'new' ? { person } : { personId }),
           employee,
           relation,
@@ -227,6 +269,11 @@ export function HireEmployee({ api, go }) {
   const steps = ['Persona', 'Datos del empleado', 'Contratación', 'Revisar y guardar'];
   return (
     <div className="mx-auto max-w-4xl space-y-6">
+      {workspace?.draftStatus && (
+        <p role="status" className="notice">
+          {workspace.draftStatus}
+        </p>
+      )}
       {draft && <p className="notice">Borrador recuperado. Puedes continuar donde lo dejaste.</p>}
       <ol className="wizard-steps">
         {steps.map((s, i) => (
@@ -246,7 +293,7 @@ export function HireEmployee({ api, go }) {
           {
             [
               'Registra una persona física o reutiliza una existente para evitar duplicados.',
-              'Define empresa, código interno y remuneración mensual.',
+              'Define empresa y remuneración mensual. El código se asignará al guardar.',
               'Asigna puesto y sucursal. Los departamentos se filtran por la empresa seleccionada.',
               'Revisa los datos. Al confirmar se guardan juntos la persona, el empleado y su relación laboral.',
             ][step]
@@ -389,8 +436,7 @@ export function HireEmployee({ api, go }) {
                 api={api}
               />
               <p className="mt-5 text-sm text-muted-foreground">
-                “Usuario creador” identifica al operador registrado en el ERP. Cuando solo hay uno,
-                se selecciona automáticamente.
+                El usuario creador se registra automáticamente desde la sesión.
               </p>
             </>
           )}
@@ -412,7 +458,7 @@ export function HireEmployee({ api, go }) {
                       ? `${person.PER_NOMBRES} ${person.PER_APELLIDOS}`
                       : `${selected?.PER_NOMBRES} ${selected?.PER_APELLIDOS}`,
                   ],
-                  ['Código', employee.EML_CODIGO],
+                  ['Código', 'Se asigna al guardar'],
                   [
                     'Fecha de nacimiento',
                     (mode === 'new' ? person : selected)?.PER_FECHA_NACIMIENTO || 'Sin registrar',

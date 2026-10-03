@@ -246,6 +246,27 @@ export async function verifyWorkflow(app) {
     bankId: bank.CBE_ID,
     date: '2026-09-24',
     amount: '300',
+    state: 'PENDIENTE',
+  });
+  const pendingPayment = (await get(lpath)).payments.find((p) => p.RPL_ESTADO === 'PENDIENTE');
+  assert.ok(pendingPayment);
+  assert.equal((await get(lpath)).pending, '300.00');
+  await call(
+    'post',
+    lpath,
+    { action: 'ESTADO', paymentId: pendingPayment.RPL_ID, state: 'CONFIRMADA', reference: '  ' },
+    422,
+  );
+  await call('post', lpath, {
+    action: 'ESTADO',
+    paymentId: pendingPayment.RPL_ID,
+    state: 'RECHAZADA',
+  });
+  assert.equal((await get(lpath)).pending, '300.00');
+  await call('post', lpath, {
+    action: 'ESTADO',
+    paymentId: pendingPayment.RPL_ID,
+    state: 'CONFIRMADA',
     reference: 'QA-LIQ-2',
   });
   assert.equal((await get(lpath)).pending, '0.00');

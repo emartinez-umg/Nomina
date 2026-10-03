@@ -60,7 +60,7 @@ export async function verifyHr(app, c, ids) {
   );
   const otherCompany = await api
     .post(root + '/erp-empresa')
-    .send({ EMP_RAZON_SOCIAL: 'Otra empresa ensayo', EMP_NIT: 'HR-OTHER' });
+    .send({ EMP_RAZON_SOCIAL: 'Otra empresa ensayo', EMP_NIT: '1234567-9' });
   assert.equal(otherCompany.status, 201);
   const other = otherCompany.body.EMP_ID;
   const department = await api

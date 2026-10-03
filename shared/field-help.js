@@ -13,9 +13,9 @@ const examples = {
   PER_NOMBRE_COMERCIAL: 'Servicios del Centro',
   EMP_RAZON_SOCIAL: 'Empresa de ejemplo, S. A.',
   EMP_NOMBRE_COMERCIAL: 'Empresa de ejemplo',
-  EMP_NIT: '1234567-8',
+  EMP_NIT: '1234567-9',
   PDC_NUMERO: '1234567890101',
-  EML_CODIGO: 'EMP-001',
+  EML_CODIGO: 'Se asigna al guardar',
   EML_IGSS: '123456789',
   NCE_NOMBRE: 'María López',
   NCE_PARENTESCO: 'Madre',
@@ -131,7 +131,7 @@ export function hintFor(f) {
     CBE_NUMERO: 'Copia el número indicado por el banco, conservando ceros iniciales.',
     PAI_CODIGO_ISO: 'Código de dos letras del país.',
     EML_CODIGO: 'Código interno único del empleado.',
-    EMP_NIT: 'Escribe el NIT de la empresa, incluido su dígito verificador.',
+    EMP_NIT: 'Sin espacios, con guion y dígito verificador. Puede terminar en K.',
   }[f.name];
   if (/_ESTADO$/.test(f.name))
     return 'Escribe el estado acordado por tu organización. Este campo no tiene una lista de estados definida en la base de datos.';

@@ -1,3 +1,6 @@
+import { canUseTable, roles } from '../../../shared/access.js';
+import { useAuth } from '../auth/AuthGate';
+import { birthBounds } from '../../../shared/business-rules.js';
 import { useWorkspace } from '../state/WorkspaceContext';
 import { stateOptions } from '../../../shared/workflow.js';
 import { useEffect, useId, useState } from 'react';
@@ -37,6 +40,14 @@ export function FormFields({
   extraContext = {},
 }) {
   const workspace = useWorkspace();
+  const auth = useAuth();
+  const memberships =
+    auth?.user.memberships?.filter((m) => m.companyId === workspace?.company) || [];
+  const role = memberships.some((m) => m.role === roles.SYSTEM)
+    ? roles.SYSTEM
+    : memberships.some((m) => m.role === roles.PAYROLL)
+      ? roles.PAYROLL
+      : auth?.user.role || roles.EMPLOYEE;
   const prefix = useId(),
     fields = table.fields.filter((f) => !f.identity && (!names || names.includes(f.name)));
   const [creating, setCreating] = useState(null),
@@ -133,6 +144,8 @@ export function FormFields({
                 errorId = id + '-error',
                 disabled =
                   readOnly ||
+                  f.generated ||
+                  (f.name === 'USU_ID_CREA' && !auth?.user.localMode) ||
                   (table.name === 'NOM_RELACION_LABORAL' && f.name === 'MBA_ID') ||
                   (editing && table.name === 'NOM_RELACION_LABORAL' && f.name === 'EML_ID') ||
                   [
@@ -159,13 +172,25 @@ export function FormFields({
                   <label htmlFor={id} className="mb-2 block text-sm font-semibold">
                     {f.label}
                     {(f.required ||
+                      (f.name === 'TRP_REFERENCIA' && values.TRP_ESTADO === 'CONFIRMADA') ||
                       (table.name === 'ERP_PERSONA' &&
                         (values.PER_TIPO === 'J'
                           ? f.name === 'PER_RAZON_SOCIAL'
                           : ['PER_NOMBRES', 'PER_APELLIDOS'].includes(f.name)))) &&
                       f.default === undefined && <span className="ml-1 text-destructive">*</span>}
                   </label>
-                  {f.ref ? (
+                  {f.name === 'USU_ID_CREA' && !auth?.user.localMode ? (
+                    <Input
+                      id={id}
+                      value={
+                        editing && values.USU_ID_CREA !== auth?.user.id
+                          ? `Usuario ERP ${values.USU_ID_CREA}`
+                          : auth?.user.login || 'Usuario de la sesión'
+                      }
+                      disabled
+                      aria-describedby={description}
+                    />
+                  ) : f.ref ? (
                     <ForeignKeySelect
                       id={id}
                       field={f}
@@ -174,7 +199,8 @@ export function FormFields({
                       disabled={disabled}
                       filters={referenceFilters(f, context)}
                       onCreate={
-                        !disabled && allForms.some((t) => t.name === f.ref.table)
+                        !disabled &&
+                        allForms.some((t) => t.name === f.ref.table && canUseTable(role, t, true))
                           ? () =>
                               setCreating({
                                 table: allForms.find((t) => t.name === f.ref.table),
@@ -207,7 +233,7 @@ export function FormFields({
                   ) : stateOptions(f) ? (
                     <select
                       id={id}
-                      value={values[f.name] ?? ''}
+                      value={f.generated && !editing ? '' : (values[f.name] ?? '')}
                       onChange={(e) => update(f.name, e.target.value)}
                       disabled={disabled}
                       aria-invalid={!!errors[f.name]}
@@ -244,13 +270,13 @@ export function FormFields({
                     <textarea
                       id={id}
                       rows={3}
-                      value={values[f.name] ?? ''}
+                      value={f.generated && !editing ? '' : (values[f.name] ?? '')}
                       onChange={(e) => update(f.name, e.target.value)}
                       disabled={disabled}
                       aria-invalid={!!errors[f.name]}
                       aria-describedby={description}
                       maxLength={f.maxLength}
-                      placeholder={exampleFor(f)}
+                      placeholder={f.generated ? 'Se asigna al guardar' : exampleFor(f)}
                       className="w-full rounded-lg border border-input p-3 focus-visible:ring-2 aria-invalid:border-destructive"
                     />
                   ) : (
@@ -271,16 +297,24 @@ export function FormFields({
                             : undefined
                       }
                       min={
-                        f.min !== undefined
-                          ? f.exclusiveMin
-                            ? String(Number(f.min) + 10 ** -f.scale)
-                            : f.min
+                        f.name === 'PER_FECHA_NACIMIENTO'
+                          ? birthBounds().min
+                          : f.min !== undefined
+                            ? f.exclusiveMin
+                              ? String(Number(f.min) + 10 ** -f.scale)
+                              : f.min
+                            : f.type === 'DATE'
+                              ? '0001-01-01'
+                              : undefined
+                      }
+                      max={
+                        f.name === 'PER_FECHA_NACIMIENTO'
+                          ? birthBounds().max
                           : f.type === 'DATE'
-                            ? '0001-01-01'
+                            ? '9999-12-31'
                             : undefined
                       }
-                      max={f.type === 'DATE' ? '9999-12-31' : undefined}
-                      value={values[f.name] ?? ''}
+                      value={f.generated && !editing ? '' : (values[f.name] ?? '')}
                       onChange={(e) =>
                         update(
                           f.name,
@@ -297,13 +331,17 @@ export function FormFields({
                       maxLength={isPhone(f) ? undefined : f.maxLength}
                       aria-invalid={!!errors[f.name]}
                       aria-describedby={description}
-                      placeholder={exampleFor(f)}
+                      placeholder={f.generated ? 'Se asigna al guardar' : exampleFor(f)}
                     />
                   )}
                   <p id={hint} className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                     {f.default === 'SYSTIMESTAMP' && !editing
                       ? 'Déjalo vacío para usar la fecha y hora del servidor.'
-                      : hintFor(f)}
+                      : f.name === 'TRP_REFERENCIA'
+                        ? 'Obligatoria al seleccionar CONFIRMADA. Copia la referencia de la operación bancaria.'
+                        : f.generated
+                          ? 'Se asigna al guardar. Numeración automática por empresa.'
+                          : hintFor(f)}
                   </p>
                   {errors[f.name] && (
                     <p id={errorId} role="alert" className="mt-1 text-sm text-destructive">

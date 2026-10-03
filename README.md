@@ -1,6 +1,6 @@
 # Nómina y base integrada del ERP
 
-Base Oracle 21c con **194 tablas del ERP**, incluidas **35 tablas de Nómina**, más **4 tablas complementarias de seguimiento de RR. HH.**. La interfaz incluye dashboard, alta guiada, expediente de empleados y **51 formularios**: 35 de Nómina y 16 maestros del ERP necesarios para Recursos Humanos. No incluye login.
+Base Oracle 21c con **194 tablas del ERP**, incluidas **35 tablas de Nómina**, más **9 tablas complementarias de seguimiento, accesos y portal**. La interfaz incluye dashboard, alta guiada, expediente de empleados y **51 formularios**: 35 de Nómina y 16 maestros del ERP necesarios para Recursos Humanos. Incluye acceso por usuario, empresa y rol.
 
 Empieza en [Inicio](http://127.0.0.1:5173/nomina/dashboard) y consulta la [guía de Recursos Humanos](docs/guia-recursos-humanos.md), también disponible dentro de la aplicación.
 
@@ -10,7 +10,7 @@ La versión del 11 de septiembre de 2026 sustituye los maestros simulados por la
 
 La mejora del 25 de septiembre incorpora borradores, empresa de trabajo persistente, filtros combinados, exportación, revisión de planillas y novedades, controles de pagos, vacaciones y bajas, pagos de liquidación e historial. Consulta [el detalle y los límites](docs/mejoras-ux-2026-09-25.md).
 
-Para actualizar una base existente, ejecuta `npm run db:workflow` antes de arrancar la nueva API. La migración agrega cuatro tablas y conserva los registros existentes.
+Para actualizar una base existente, ejecuta `npm run db:workflow` antes de arrancar la nueva API. La migración instala las nueve tablas complementarias (cuatro de seguimiento y cinco nuevas), actualiza restricciones de estados y conserva los registros existentes. Crea `admin.nomina` si no hay un administrador activo; guarda su contraseña temporal en `.nomina-admin-inicial.txt`, con permisos de lectura para el propietario. Cámbiala en el primer ingreso y elimina ese archivo después.
 
 ## Instancia actual
 
@@ -36,10 +36,11 @@ npm ci
 docker compose up -d
 docker compose ps
 # Esperar el estado healthy.
+npm run db:workflow
 npm run dev
 ```
 
-El primer arranque ejecuta `db/init.sql`: esquema final completo, datos ficticios de desarrollo y catálogos del script. Los IDs fiscales `DEV-*`, direcciones pendientes y documentos `DEV / PRUEBA-*` son ejemplos sin validez fiscal. El usuario de desarrollo tiene un marcador de contraseña deshabilitada, sin autenticación implementada.
+El primer arranque ejecuta `db/init.sql`: esquema final completo, datos ficticios de desarrollo y catálogos del script. Los IDs fiscales `DEV-*`, direcciones pendientes y documentos `DEV / PRUEBA-*` son ejemplos sin validez fiscal. El usuario antiguo de desarrollo tiene una contraseña deshabilitada. `npm run db:workflow` crea el administrador inicial de Nómina.
 
 `db/stubs.sql` y `db/NOM_tablas_completas.sql` son referencias de la versión anterior; ya no se ejecutan en instalaciones nuevas. Los datos persisten en el volumen de Docker. `docker compose stop` y `docker compose start` permiten detener y reanudar sin eliminar datos.
 
@@ -99,7 +100,7 @@ Los estados de planilla y vacaciones se gestionan mediante sus pantallas de revi
 
 ## Configuración e integración
 
-El backend usa Express y `node-oracledb` Thin con pool; el frontend React, Vite, Tailwind y componentes shadcn/ui basados en Radix. Se concilian los totales de planilla contra sus conceptos. No se calculan tasas ni prestaciones legales, no se realizan desembolsos y no se incluye login. Los parámetros 1.5 de hora extra y 1 de exención se cargan del script proporcionado, sin realizar cálculos legales.
+El backend usa Express y `node-oracledb` Thin con pool; el frontend React, Vite, Tailwind y componentes shadcn/ui basados en Radix. Se concilian los totales de planilla contra sus conceptos. No se calculan tasas ni prestaciones legales, no se realizan desembolsos. La autenticación está activada por defecto. Los parámetros 1.5 de hora extra y 1 de exención se cargan del script proporcionado, sin realizar cálculos legales.
 
 Las credenciales y el tamaño del pool están en `NOM_DB_*`; `ORACLE_PWD` se usa en el contenedor y en tareas administrativas de instalación/prueba. `NOM_API_BASE`, `NOM_CORS_ORIGIN`, `HOST` y `PORT` configuran la API. `VITE_NOM_API_BASE`, `VITE_NOM_BASE_PATH` y `VITE_API_PROXY_TARGET` configuran el frontend. `NOM_EXTERNAL_MODE=erp` identifica los maestros reales; no ejecuta DDL.
 
@@ -133,8 +134,18 @@ npm run schema
 
 - `GET /api/nomina/hr/dashboard?company={EMP_ID}`: indicadores reales, importes como texto decimal, pendientes y planillas recientes. El filtro de empresa es opcional.
 - `POST /api/nomina/hr/contrataciones`: guarda nueva persona (o `personId` existente), `employee`, `relation` y opcionalmente `email`/`phone` en una sola transacción.
-- Los maestros editables tienen rutas `erp-persona`, `erp-empresa`, etc. No se exponen contraseñas ni mantenimiento de usuarios.
+- Los maestros editables tienen rutas `erp-persona`, `erp-empresa`, etc. No se exponen contraseñas. Solo el administrador del sistema accede al mantenimiento de usuarios.
 - Los selectores admiten filtros por columnas permitidas (`filter_EMP_ID=...`), creación anidada y reintento de lectura.
-- La contratación valida empresa/sucursal/departamento; el detalle de planilla valida la empresa de la relación; la transferencia valida la cuenta del empleado. Son validaciones de datos, no autorización.
+- La contratación valida empresa/sucursal/departamento; el detalle de planilla valida la empresa de la relación; la transferencia valida la cuenta del empleado. Estas validaciones complementan el control de acceso del servidor por rol y empresa.
 
-Las pruebas de navegador pueden ejecutarse en una instancia descartable con `node scripts/preview-hr-test.js` (puerto 5174, API 3002). Ctrl+C cierra ambos servicios y elimina su esquema temporal; las credenciales quedan en memoria. La aplicación habitual sigue en el puerto 5173.
+Las pruebas de navegador pueden ejecutarse en una instancia descartable con `node scripts/preview-hr-test.js --auth` (puerto 5174, API 3002). Ctrl+C cierra ambos servicios y elimina su esquema temporal; el acceso ficticio es `qa.preview` / `Nomina-Preview-2026!`, exclusivo del esquema temporal. La aplicación habitual sigue en el puerto 5173.
+
+## Cambios de octubre de 2026
+
+Se conservaron las vistas, los colores, las fuentes y los iconos actuales. Consulta [el estado de los 27 puntos](docs/cambios-pendientes-2026-10-03.md), [el flujo de formularios](docs/flujo-nomina.md) y [la revisión del libro de salarios](docs/revision-libro-salarios.md).
+
+Los tres roles son Administrador del Sistema, Administrador de Nómina y Colaborador. Los colaboradores consultan su información, calendario y recomendaciones propias. Los cambios de rol revocan las sesiones. Las contraseñas usan scrypt y las sesiones cookies HttpOnly; en producción requieren HTTPS.
+
+Las escrituras de la API requieren `X-Nomina-Request: 1`. Selecciona una empresa autorizada con `X-Nomina-Company`. Para editar un registro, toma `__version` de su GET y envíalo en `If-Match`; un borrador obsoleto recibe 409 sin sobrescribir datos. Los borradores se conservan en el navegador por usuario durante 15 días; no se sincronizan entre dispositivos.
+
+La regla de salario automático sigue pendiente de confirmación del ingeniero. Los importes de sueldo y bonificación se capturan por separado. Los valores de fechas, vencimiento de borradores y avisos se configuran en `shared/business-rules.js`.

@@ -19,10 +19,10 @@ const commands = [
   })),
 ];
 
-test('navigation exposes all 51 forms and three standalone pages without duplicate destinations', () => {
+test('navigation exposes all forms, pages and actions without duplicate commands', () => {
   const results = searchCommands(commands, '');
-  assert.equal(results.length, 54);
-  assert.equal(new Set(results.map((result) => result.slug)).size, 54);
+  assert.equal(results.length, 51 + primaryPages.length);
+  assert.equal(new Set(results.map((result) => result.id || result.slug)).size, results.length);
   for (const command of commands) {
     assert.ok(searchCommands(commands, command.title).some((item) => item.slug === command.slug));
   }
@@ -50,7 +50,7 @@ test('category filters constrain results and can be cleared without losing comma
     assert.ok(results.length > 0);
     assert.ok(results.every((item) => item.group === group.id));
   }
-  assert.equal(searchCommands(commands, '', 'general').length, 3);
+  assert.equal(searchCommands(commands, '', 'general').length, primaryPages.length);
   assert.deepEqual(searchCommands(commands, 'bancos', 'asistencia'), []);
   assert.ok(searchCommands(commands, 'bancos').some((item) => item.slug === 'erp-banco'));
 });

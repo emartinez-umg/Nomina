@@ -1,3 +1,5 @@
+import { employeeCode } from '../services/correlatives.js';
+import { validDate } from '../../../shared/validation.js';
 import { checklist } from '../services/checklist.js';
 import { companyPredicate } from './scope.js';
 import oracledb from 'oracledb';
@@ -85,6 +87,11 @@ export function listQuery(table, catalog, query = {}) {
   if (query.filterField) {
     const f = table.fields.find((f) => f.name === query.filterField);
     if (!f) throw new ApiError(400, 'Filtro no válido.');
+    if (
+      ['DATE', 'TIMESTAMP'].includes(f.type) &&
+      !validDate(String(query.filterValue ?? ''), f.type === 'TIMESTAMP')
+    )
+      throw new ApiError(400, 'Fecha del filtro no válida.');
     binds.filter = String(query.filterValue ?? '');
     where.push(`t.${f.name}=${bindExpression(f, 'filter')}`);
   }
@@ -99,9 +106,15 @@ export function listQuery(table, catalog, query = {}) {
   for (const [key, value] of Object.entries(query).filter(([k]) => k.startsWith('filter_'))) {
     const f = table.fields.find((f) => f.name === key.slice(7));
     if (!f || String(value).length > 150) throw new ApiError(400, 'Filtro no válido.');
+    if (['DATE', 'TIMESTAMP'].includes(f.type) && !validDate(String(value), f.type === 'TIMESTAMP'))
+      throw new ApiError(400, 'Fecha del filtro no válida.');
     binds[key] = String(value);
     where.push(`t.${f.name}=${bindExpression(f, key)}`);
   }
+  if (query.pending === '1' && table.name === 'NOM_MARCAJE')
+    where.push(
+      '(t.MRC_ENTRADA IS NULL OR t.MRC_SALIDA IS NULL) AND t.AUS_ID IS NULL AND t.VAC_ID IS NULL',
+    );
   if (query.pending === '1' && table.name === 'NOM_EMPLEADO')
     where.push(
       't.EML_ACTIVO=1 AND (' +
@@ -125,11 +138,7 @@ export function listQuery(table, catalog, query = {}) {
     if (!f) throw new ApiError(400, 'Campo de fecha no válido.');
     for (const side of ['from', 'to'])
       if (query[side]) {
-        if (
-          !/^\d{4}-\d{2}-\d{2}$/.test(String(query[side])) ||
-          Number.isNaN(Date.parse(query[side]))
-        )
-          throw new ApiError(400, 'Fecha no válida.');
+        if (!validDate(String(query[side]))) throw new ApiError(400, 'Fecha no válida.');
         binds['range_' + side] = String(query[side]);
         where.push(
           `t.${f.name}${side === 'from' ? '>=' : '<'}TO_DATE(:range_${side},'YYYY-MM-DD')${side === 'to' ? '+1' : ''}`,
@@ -188,6 +197,8 @@ export function createRepository(table, catalog) {
       return result.rows[0];
     },
     async create(c, data) {
+      if (table.name === 'NOM_EMPLEADO')
+        data = { ...data, EML_CODIGO: await employeeCode(c, data.EMP_ID) };
       const fields = table.fields.filter((f) => Object.hasOwn(data, f.name) && !f.identity),
         binds = { id: { dir: oracledb.BIND_OUT, type: oracledb.STRING, maxSize: 80 } };
       fields.forEach((f, i) => (binds['v' + i] = normalizeBind(f, data[f.name])));
@@ -248,6 +259,11 @@ export async function lookup(connection, table, catalog, query = {}) {
       if (!f || String(value).length > 150)
         throw new ApiError(400, 'Filtro de catálogo no válido.');
       where += (where ? ' AND ' : ' WHERE ') + `t.${f.name}=${bindExpression(f, key)}`;
+      if (
+        ['DATE', 'TIMESTAMP'].includes(f.type) &&
+        !validDate(String(value), f.type === 'TIMESTAMP')
+      )
+        throw new ApiError(400, 'Fecha del filtro no válida.');
       binds[key] = String(value);
     }
   }

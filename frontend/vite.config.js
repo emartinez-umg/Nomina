@@ -8,6 +8,20 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss()],
     envDir: '..',
     base: env.VITE_NOM_BASE_PATH || '/nomina',
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            forms: [
+              '@radix-ui/react-dialog',
+              '@radix-ui/react-alert-dialog',
+              '@radix-ui/react-switch',
+            ],
+            schema: ['../shared/schema.json'],
+          },
+        },
+      },
+    },
     resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
     server: {
       port: 5173,

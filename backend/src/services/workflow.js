@@ -132,6 +132,10 @@ export async function guardMutation(
   removing = false,
 ) {
   const name = table.name;
+  if (name === 'NOM_PERIODO' && previous?.NPE_ESTADO === 'ANULADO')
+    fail('Un período anulado conserva su historial y no se puede editar.');
+  if (name === 'NOM_EMPLEADO' && previous && data.EML_CODIGO !== previous.EML_CODIGO)
+    fail('El código del empleado se asigna automáticamente y no se puede cambiar.', 'EML_CODIGO');
   if (
     name === 'NOM_INGRESO_VARIABLE' &&
     data.INV_ESTADO === 'PAGADA' &&
@@ -171,13 +175,18 @@ export async function guardMutation(
     previous &&
     ['NPE_TIPO', 'NPE_ANIO', 'NPE_MES', 'NPE_QUINCENA'].some((k) => data[k] !== previous[k])
   ) {
-    const used = await run(c, 'SELECT NOM_ID FROM NOM_NOMINA WHERE NPE_ID=TO_NUMBER(:id)', {
-      id: previous.NPE_ID,
-    });
-    if (used.length)
-      fail(
-        'El período ya tiene planillas. Su calendario se conserva; crea otro período para fechas distintas.',
+    for (const linked of catalog.values()) {
+      if (!linked.fields.some((f) => f.ref?.table === 'NOM_PERIODO')) continue;
+      const used = await run(
+        c,
+        `SELECT NPE_ID FROM ${linked.name} WHERE NPE_ID=TO_NUMBER(:id) FETCH FIRST 1 ROW ONLY`,
+        { id: previous.NPE_ID },
       );
+      if (used.length)
+        fail(
+          `El período tiene registros en ${linked.title || linked.name}. Su calendario se conserva; crea otro período para fechas distintas.`,
+        );
+    }
   }
   if (
     name === 'NOM_CUENTA_BANCARIA_EMPLEADO' &&
@@ -913,7 +922,7 @@ export async function payLiquidation(c, catalog, id, body, context) {
     review = await liquidationReview(c, catalog, id);
   if (body.action === 'ANULAR') {
     const payment = review.payments.find((p) => p.RPL_ID === String(body.paymentId));
-    if (!payment || payment.RPL_ESTADO !== 'CONFIRMADA') fail('Pago no disponible para anular.');
+    if (!payment || payment.RPL_ESTADO === 'ANULADA') fail('Pago no disponible para anular.');
     const reason = text(body.reason);
     await c.execute("UPDATE NOM_RH_PAGO_LIQ SET RPL_ESTADO='ANULADA' WHERE RPL_ID=TO_NUMBER(:id)", {
       id: payment.RPL_ID,
@@ -930,6 +939,41 @@ export async function payLiquidation(c, catalog, id, body, context) {
     );
     return { ok: true };
   }
+  if (body.action === 'ESTADO') {
+    const payment = review.payments.find((p) => p.RPL_ID === String(body.paymentId));
+    if (
+      !payment ||
+      !['PENDIENTE', 'RECHAZADA'].includes(payment.RPL_ESTADO) ||
+      !['PENDIENTE', 'CONFIRMADA', 'RECHAZADA'].includes(body.state)
+    )
+      fail('Transición de pago no permitida.');
+    const reference =
+      body.state === 'CONFIRMADA'
+        ? text(body.reference || payment.RPL_REFERENCIA, 200)
+        : payment.RPL_REFERENCIA;
+    if (
+      body.state === 'CONFIRMADA' &&
+      (!review.balanced || money(payment.RPL_MONTO).gt(review.pending))
+    )
+      fail('Revisa los conceptos y el saldo antes de confirmar este pago.');
+    await c.execute(
+      'UPDATE NOM_RH_PAGO_LIQ SET RPL_ESTADO=:state,RPL_REFERENCIA=:reference WHERE RPL_ID=TO_NUMBER(:id)',
+      { state: body.state, reference, id: payment.RPL_ID },
+    );
+    await audit(
+      c,
+      catalog,
+      'NOM_LIQUIDACION_LABORAL',
+      id,
+      'ESTADO_PAGO',
+      payment,
+      { ...payment, RPL_ESTADO: body.state, RPL_REFERENCIA: reference, EML_ID: l.EML_ID },
+      context,
+    );
+    return { ok: true };
+  }
+  const state = body.state || 'CONFIRMADA';
+  if (!paymentStates.includes(state)) fail('Selecciona un estado de pago permitido.');
   if (!review.balanced)
     fail('El monto de la liquidación debe coincidir con sus conceptos antes del pago.');
   const bank = await get(c, catalog, 'NOM_CUENTA_BANCARIA_EMPLEADO', identifier(body.bankId), true);
@@ -937,11 +981,16 @@ export async function payLiquidation(c, catalog, id, body, context) {
   const amount = money(body.amount);
   if (amount.lte(0) || amount.gt(review.pending))
     fail('El pago debe ser positivo y no superar el saldo pendiente.');
-  const reference = text(body.reference, 200),
+  const reference =
+      state === 'CONFIRMADA'
+        ? text(body.reference, 200)
+        : body.reference
+          ? text(body.reference, 200)
+          : null,
     when = date(body.date);
   await c.execute(
-    "INSERT INTO NOM_RH_PAGO_LIQ (LIL_ID,CBE_ID,RPL_FECHA,RPL_MONTO,RPL_REFERENCIA) VALUES (TO_NUMBER(:id),TO_NUMBER(:bank),TO_DATE(:day,'YYYY-MM-DD'),TO_NUMBER(:amount),:reference)",
-    { id, bank: bank.CBE_ID, day: when, amount: amount.toFixed(2), reference },
+    "INSERT INTO NOM_RH_PAGO_LIQ (LIL_ID,CBE_ID,RPL_FECHA,RPL_MONTO,RPL_REFERENCIA,RPL_ESTADO) VALUES (TO_NUMBER(:id),TO_NUMBER(:bank),TO_DATE(:day,'YYYY-MM-DD'),TO_NUMBER(:amount),:reference,:state)",
+    { id, bank: bank.CBE_ID, day: when, amount: amount.toFixed(2), reference, state },
   );
   await audit(
     c,
@@ -950,7 +999,14 @@ export async function payLiquidation(c, catalog, id, body, context) {
     id,
     'PAGO',
     null,
-    { EML_ID: l.EML_ID, amount: amount.toFixed(2), reference, date: when, bank: bank.CBE_ID },
+    {
+      EML_ID: l.EML_ID,
+      amount: amount.toFixed(2),
+      reference,
+      date: when,
+      bank: bank.CBE_ID,
+      state,
+    },
     context,
   );
   return { ok: true };

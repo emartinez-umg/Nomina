@@ -1,3 +1,14 @@
+import { HelpPanel } from './components/HelpPanel';
+import {
+  MyInformation,
+  StaffCalendar,
+  Recommendations,
+  UserAdministration,
+  ClosingNotices,
+} from './modules/PersonalPortal';
+import { AuthGate, useAuth } from './auth/AuthGate';
+import { canOpenPage, canUseTable, roles } from '../../shared/access.js';
+import { ResumeWork } from './components/ResumeWork';
 import { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { Toaster } from 'sonner';
 import schema from '../../shared/schema.json';
@@ -25,12 +36,20 @@ const pages = {
   expediente: 'Expediente del empleado',
   guia: 'Guía de uso',
   revision: 'Revisión y seguimiento',
+  'mi-informacion': 'Mi información',
+  calendario: 'Calendario',
+  recomendaciones: 'Recomendaciones',
+  usuarios: 'Usuarios y roles',
 };
 export function NominaModule(props) {
   return (
-    <WorkspaceProvider>
-      <NominaWorkspace {...props} />
-    </WorkspaceProvider>
+    <AuthGate apiBaseUrl={props.apiBaseUrl} fetcher={props.fetcher}>
+      {(user) => (
+        <WorkspaceProvider key={user.id} scope={user.id}>
+          <NominaWorkspace {...props} />
+        </WorkspaceProvider>
+      )}
+    </AuthGate>
   );
 }
 function NominaWorkspace({
@@ -40,9 +59,31 @@ function NominaWorkspace({
   embedded = false,
 }) {
   const workspace = useWorkspace();
-  const api = useMemo(() => createApi(apiBaseUrl, fetcher), [apiBaseUrl, fetcher]);
+  const auth = useAuth();
+  const membership =
+    auth.user.memberships?.find(
+      (m) => m.companyId === workspace.company && m.role === roles.SYSTEM,
+    ) ||
+    auth.user.memberships?.find(
+      (m) => m.companyId === workspace.company && m.role === roles.PAYROLL,
+    ) ||
+    auth.user.memberships?.find((m) => m.companyId === workspace.company) ||
+    auth.user.memberships?.[0];
+  const role = membership?.role || auth.user.role;
+  const company = membership?.companyId || workspace.company;
+  const allowedForms = allForms.filter((t) => canUseTable(role, t));
+  useEffect(() => {
+    if (membership && workspace.company !== membership.companyId)
+      workspace.setCompany(membership.companyId);
+  }, [membership?.companyId, workspace.company]);
+  const api = useMemo(
+    () => createApi(apiBaseUrl, fetcher, company ? { 'X-Nomina-Company': company } : {}),
+    [apiBaseUrl, fetcher, company],
+  );
   const resolve = () => ({
-    slug: location.pathname.replace(/\/$/, '').slice(basePath.length + 1) || 'dashboard',
+    slug:
+      location.pathname.replace(/\/$/, '').slice(basePath.length + 1) ||
+      (role === roles.EMPLOYEE ? 'mi-informacion' : 'dashboard'),
     search: location.search,
   });
   const [route, setRoute] = useState(resolve);
@@ -68,7 +109,8 @@ function NominaWorkspace({
         Saltar al contenido
       </a>
       <TopNavigation
-        tables={allForms}
+        tables={allowedForms}
+        role={role}
         groups={allGroups}
         route={route}
         basePath={basePath}
@@ -77,24 +119,64 @@ function NominaWorkspace({
       />
       <div className="main-shell">
         <main id="nomina-content" className="content">
+          <div
+            className="mb-4 flex flex-wrap items-center justify-between gap-3"
+            data-tour="profile"
+          >
+            <span>
+              {auth.user.login} · {auth.roleLabels[role]}
+            </span>
+            {!auth.user.localMode && (
+              <Button
+                variant="outline"
+                onClick={() => auth.logout().catch((e) => window.alert(e.message))}
+              >
+                Cerrar sesión
+              </Button>
+            )}
+          </div>
           <div className="page-title">
             <h1>{table?.title || pages[route.slug] || 'Página no encontrada'}</h1>
             <p>
-              <span>Nómina</span>
+              <button
+                className="underline"
+                onClick={() => go(role === roles.EMPLOYEE ? 'mi-informacion' : 'dashboard')}
+              >
+                Nómina
+              </button>
               <span aria-hidden="true">/</span>
-              <span>{group?.label || 'Recursos Humanos'}</span>
+              <button className="underline" onClick={() => go('guia')}>
+                {group?.label || 'Recursos Humanos'}
+              </button>
             </p>
           </div>
           <div className="hr-workspace-context">
             <div>
               <label htmlFor="workspace-company">Empresa de trabajo</label>
-              <ForeignKeySelect
-                id="workspace-company"
-                field={{ label: 'Empresa', ref: { table: 'ERP_EMPRESA' } }}
-                value={workspace.company}
-                onChange={workspace.setCompany}
-                api={api}
-              />
+              {!auth.user.localMode ? (
+                <select
+                  id="workspace-company"
+                  className="control w-full"
+                  value={company}
+                  onChange={(e) => workspace.setCompany(e.target.value)}
+                >
+                  {[...new Map(auth.user.memberships.map((m) => [m.companyId, m])).values()].map(
+                    (m) => (
+                      <option key={m.companyId} value={m.companyId}>
+                        {m.companyName}
+                      </option>
+                    ),
+                  )}
+                </select>
+              ) : (
+                <ForeignKeySelect
+                  id="workspace-company"
+                  field={{ label: 'Empresa', ref: { table: 'ERP_EMPRESA' } }}
+                  value={workspace.company}
+                  onChange={workspace.setCompany}
+                  api={api}
+                />
+              )}
             </div>
             <p>
               {workspace.company
@@ -102,10 +184,27 @@ function NominaWorkspace({
                 : 'Todas las empresas · selecciona una para enfocar el trabajo.'}
             </p>
             {workspace.drafts.size > 0 && (
-              <span role="status">{workspace.drafts.size} borrador(es) en esta sesión</span>
+              <span role="status">{workspace.drafts.size} borrador(es) en este navegador</span>
             )}
           </div>
-          {route.slug === 'revision' ? (
+          <HelpPanel
+            slug={route.slug}
+            table={table}
+            api={api}
+            go={go}
+            role={role}
+            tables={allForms}
+          />
+          <ResumeWork go={go} />
+          {!auth.user.localMode && role !== roles.EMPLOYEE && <ClosingNotices api={api} go={go} />}
+          {!canOpenPage(role, route.slug, allForms) ? (
+            <section className="hr-card">
+              <h2>Esta sección no está disponible para tu rol</h2>
+              <Button onClick={() => go(role === roles.EMPLOYEE ? 'mi-informacion' : 'dashboard')}>
+                Volver a mi inicio
+              </Button>
+            </section>
+          ) : route.slug === 'revision' ? (
             <Suspense
               fallback={
                 <p role="status" className="hr-card">
@@ -113,25 +212,36 @@ function NominaWorkspace({
                 </p>
               }
             >
-              <WorkflowPage key={route.search} api={api} go={go} />
+              <WorkflowPage key={route.search + company} api={api} go={go} />
             </Suspense>
           ) : table ? (
             <EntityPage
               key={route.slug + route.search + workspace.company}
               table={table}
+              readOnly={!canUseTable(role, table, true)}
               api={api}
               go={go}
             />
+          ) : route.slug === 'mi-informacion' ? (
+            <MyInformation api={api} />
+          ) : route.slug === 'calendario' ? (
+            <StaffCalendar key={company} api={api} go={go} role={role} />
+          ) : route.slug === 'recomendaciones' ? (
+            <Recommendations key={company} api={api} go={go} role={role} />
+          ) : route.slug === 'usuarios' ? (
+            <UserAdministration key={company} api={api} />
           ) : route.slug === 'dashboard' ? (
             <Dashboard api={api} go={go} />
           ) : route.slug === 'alta-empleado' ? (
-            <HireEmployee key={route.search} api={api} go={go} />
+            <HireEmployee key={route.search + company} api={api} go={go} />
           ) : route.slug === 'expediente' ? (
-            <EmployeeFile key={route.search} api={api} go={go} />
+            <EmployeeFile key={route.search + company} api={api} go={go} />
           ) : route.slug === 'guia' ? (
             <UserGuide go={go} />
           ) : (
-            <Button onClick={() => go('dashboard')}>Volver al inicio</Button>
+            <Button onClick={() => go(role === roles.EMPLOYEE ? 'mi-informacion' : 'dashboard')}>
+              Volver al inicio
+            </Button>
           )}
         </main>
       </div>

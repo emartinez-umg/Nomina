@@ -31,6 +31,7 @@ function metadata(raw, external = false) {
       type: c.type,
       required: c.required,
       identity: c.identity,
+      ...(c.name === 'EML_CODIGO' ? { generated: true } : {}),
       ...(c.type === 'NUMBER' ? { precision: c.precision ?? 38, scale: c.scale ?? 0 } : {}),
       ...(['VARCHAR2', 'CHAR'].includes(c.type) ? { maxLength: c.length } : {}),
       ...(!c.identity && c.default !== null ? { default: c.default.replace(/^'|'$/g, '') } : {}),

@@ -7,6 +7,20 @@ const invalid = (field, message) => {
 };
 export async function validateRelations(c, table, data, catalog) {
   const get = async (name, id) => createRepository(catalog.get(name), catalog).get(c, String(id));
+  if (table.fields.some((f) => f.ref?.table === 'NOM_PERIODO') && data.NPE_ID) {
+    const period = await createRepository(catalog.get('NOM_PERIODO'), catalog).get(
+      c,
+      String(data.NPE_ID),
+      true,
+    );
+    if (period.NPE_ESTADO === 'ANULADO')
+      invalid('NPE_ID', 'El período está anulado. Selecciona otro período.');
+  }
+  if (table.name === 'ERP_PERSONA_DOCUMENTO' && data.TDI_ID) {
+    const type = await get('ERP_TIPO_DOCUMENTO_IDENTIDAD', data.TDI_ID);
+    if (/DPI|DOCUMENTO PERSONAL/i.test(type.TDI_NOMBRE) && !/^\d{13}$/.test(data.PDC_NUMERO || ''))
+      invalid('PDC_NUMERO', 'El DPI debe contener exactamente 13 dígitos, sin espacios.');
+  }
   if (table.name === 'NOM_EMPLEADO') {
     const p = await get('ERP_PERSONA', data.PER_ID);
     if (p.PER_TIPO !== 'F') invalid('PER_ID', 'Selecciona una persona física para el empleado.');

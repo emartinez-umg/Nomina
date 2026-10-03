@@ -20205,7 +20205,7 @@
         "columns": [
           "NPE_ESTADO"
         ],
-        "sql": "NPE_ESTADO IN('ABIERTO','CALCULADO','PAGADO','CERRADO')"
+        "sql": "NPE_ESTADO IN('ABIERTO','CALCULADO','PAGADO','CERRADO','ANULADO')"
       },
       {
         "name": "PK_NOM_PERIODO",

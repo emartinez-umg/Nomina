@@ -37,7 +37,7 @@ try {
     "INSERT INTO CON_CUENTA_CONTABLE (EMP_ID,CCO_CODIGO,CCO_NOMBRE,CCO_TIPO,CCO_NIVEL,CCO_ACEPTA_MOVIMIENTO,CCO_NATURALEZA) VALUES (1,'TEST-H','Pasivo de ensayo','PASIVO',1,1,'H')",
   );
   console.log(
-    'OK: instalación limpia de 194 tablas ERP y 4 tablas de seguimiento, semillas SQL UTF-8, catálogos idempotentes y naturaleza contable H.',
+    'OK: instalación limpia de 194 tablas ERP y 9 tablas complementarias, semillas SQL UTF-8, catálogos idempotentes y naturaleza contable H.',
   );
 } finally {
   if (c) await c.close();

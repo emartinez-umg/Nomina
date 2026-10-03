@@ -123,8 +123,7 @@ export function WorkflowPage({ api, go }) {
       <section className="hr-card">
         <h2>{names[kind] || 'Revisión'}</h2>
         <p className="text-sm text-muted-foreground">
-          Las decisiones se guardan con fecha, motivo y el operador disponible. El modo local no
-          autentica la identidad del operador.
+          Las decisiones se guardan con fecha, motivo y el usuario de la sesión.
         </p>
       </section>
       {error && (
@@ -935,7 +934,8 @@ function Liquidation({ data: d, act, busy, api, go }) {
   const [bankId, setBankId] = useState(''),
     [date, setDate] = useState(today()),
     [value, setValue] = useState(''),
-    [reference, setReference] = useState('');
+    [reference, setReference] = useState(''),
+    [state, setState] = useState('PENDIENTE');
   const l = d.liquidation;
   return (
     <>
@@ -981,7 +981,31 @@ function Liquidation({ data: d, act, busy, api, go }) {
                   <td>{amount(p.RPL_MONTO)}</td>
                   <td>{p.RPL_ESTADO}</td>
                   <td>
-                    {p.RPL_ESTADO === 'CONFIRMADA' && (
+                    {['PENDIENTE', 'RECHAZADA'].includes(p.RPL_ESTADO) && (
+                      <select
+                        className="control"
+                        aria-label={'Estado del pago ' + p.RPL_ID}
+                        value={p.RPL_ESTADO}
+                        disabled={busy}
+                        onChange={(e) => {
+                          const state = e.target.value;
+                          const reference =
+                            state === 'CONFIRMADA'
+                              ? window.prompt(
+                                  'Referencia bancaria obligatoria:',
+                                  p.RPL_REFERENCIA || '',
+                                )
+                              : undefined;
+                          if (state !== 'CONFIRMADA' || reference?.trim())
+                            act({ action: 'ESTADO', paymentId: p.RPL_ID, state, reference });
+                        }}
+                      >
+                        {['PENDIENTE', 'CONFIRMADA', 'RECHAZADA'].map((s) => (
+                          <option key={s}>{s}</option>
+                        ))}
+                      </select>
+                    )}
+                    {p.RPL_ESTADO !== 'ANULADA' && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -1008,11 +1032,19 @@ function Liquidation({ data: d, act, busy, api, go }) {
       </section>
       {Number(d.pending) > 0 && (
         <section className="hr-card">
-          <h2>Registrar pago confirmado</h2>
+          <h2>Registrar pago</h2>
           <p className="text-sm">
             Esta acción registra un pago ya realizado. No envía dinero al banco.
           </p>
           <div className="workflow-fields">
+            <label>
+              Estado
+              <select className="control" value={state} onChange={(e) => setState(e.target.value)}>
+                {['PENDIENTE', 'CONFIRMADA', 'RECHAZADA', 'ANULADA'].map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </label>
             <label>
               Cuenta del empleado *
               <ForeignKeySelect
@@ -1048,7 +1080,7 @@ function Liquidation({ data: d, act, busy, api, go }) {
               />
             </label>
             <label>
-              Referencia bancaria *
+              Referencia bancaria {state === 'CONFIRMADA' ? '*' : '(opcional)'}
               <input
                 className="control"
                 maxLength={200}
@@ -1058,15 +1090,22 @@ function Liquidation({ data: d, act, busy, api, go }) {
             </label>
           </div>
           <Button
-            disabled={busy || !d.balanced || !bankId || !value || !reference.trim() || !date}
+            disabled={
+              busy ||
+              !d.balanced ||
+              !bankId ||
+              !value ||
+              (state === 'CONFIRMADA' && !reference.trim()) ||
+              !date
+            }
             onClick={async () => {
-              if (await act({ bankId, date, amount: value, reference })) {
+              if (await act({ bankId, date, amount: value, reference, state })) {
                 setValue('');
                 setReference('');
               }
             }}
           >
-            Guardar pago confirmado
+            Guardar pago
           </Button>
         </section>
       )}

@@ -1,8 +1,25 @@
 import { createPool } from './config/pool.js';
 import { createApp } from './app.js';
-const pool = await createPool();
+let pool;
+try {
+  pool = await createPool();
+  const connection = await pool.getConnection();
+  try {
+    await connection.execute('SELECT 1 FROM DUAL');
+  } finally {
+    await connection.close();
+  }
+} catch (error) {
+  console.error(
+    'No se pudo iniciar Nómina: verifica que Oracle esté disponible y revisa NOM_DB_USER, NOM_DB_PASSWORD y NOM_DB_CONNECT_STRING.',
+    error.code || 'DATABASE_ERROR',
+  );
+  if (pool) await pool.close(0);
+  process.exit(1);
+}
 const app = createApp({
   pool,
+  authentication: true,
   basePath: process.env.NOM_API_BASE || '/api/nomina',
   corsOrigin: process.env.NOM_CORS_ORIGIN || 'http://localhost:5173',
   externalMode: process.env.NOM_EXTERNAL_MODE || 'erp',

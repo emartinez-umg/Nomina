@@ -17,7 +17,7 @@ function harness(handler = async () => ({ rows: [] })) {
       close: async () => state.closed++,
     }),
   };
-  return { app: createApp({ pool }), calls, state };
+  return { app: createApp({ pool, authentication: false }), calls, state };
 }
 test('metadata includes payroll and HR masters; lookup endpoints are read only', async () => {
   const { app } = harness();

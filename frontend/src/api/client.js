@@ -1,6 +1,7 @@
 export function createApi(
   baseUrl = import.meta.env?.VITE_NOM_API_BASE || '/api/nomina',
   fetcher = fetch,
+  extraHeaders = {},
 ) {
   return async (path, { signal, ...options } = {}) => {
     let response;
@@ -8,7 +9,10 @@ export function createApi(
       response = await fetcher(baseUrl + path, {
         ...options,
         signal,
+        credentials: 'include',
         headers: {
+          'X-Nomina-Request': '1',
+          ...extraHeaders,
           ...(options.body ? { 'Content-Type': 'application/json' } : {}),
           ...options.headers,
         },
@@ -33,6 +37,8 @@ export function createApi(
       );
     }
     if (!response.ok) {
+      if (data.code === 'LOGIN_REQUIRED' && typeof window !== 'undefined')
+        window.dispatchEvent(new Event('nomina-session-expired'));
       const error = new Error(data.message || 'No se pudo completar la operación.');
       error.fields = data.fields || {};
       error.code = data.code;

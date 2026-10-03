@@ -1,12 +1,31 @@
+import { useWorkspace } from '../state/WorkspaceContext';
+import { canOpenPage, roles } from '../../../shared/access.js';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { ArrowRight, BookOpen, Check, Command, Search, UserPlus, X } from 'lucide-react';
 import erpLogo from '../assets/erp-logo.png';
-import { primaryPages, searchCommands } from './navigation';
+import { primaryPages, searchCommands, moduleKeywords } from './navigation';
 import './navigation.css';
 import { NavigationMenus } from './NavigationMenus';
 
-export function TopNavigation({ tables, groups, route, basePath, go, embedded }) {
+export function TopNavigation({ tables, groups, route, basePath, go, embedded, role }) {
+  const workspace = useWorkspace();
+  const [recent, setRecent] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('nomina.recent:' + workspace.scope) || '[]');
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    setRecent((old) => {
+      const next = [route.slug, ...old.filter((s) => s !== route.slug)].slice(0, 8);
+      try {
+        localStorage.setItem('nomina.recent:' + workspace.scope, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, [route.slug, workspace.scope]);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [group, setGroup] = useState('');
@@ -18,17 +37,28 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
   const listId = useId();
   const commands = useMemo(
     () => [
-      ...primaryPages.map((page) => ({ ...page, groupLabel: 'Accesos rápidos' })),
+      ...primaryPages
+        .filter((page) => !role || canOpenPage(role, page.slug, tables))
+        .map((page) => ({ ...page, groupLabel: 'Accesos rápidos' })),
       ...tables.map((table) => ({
         slug: table.slug,
         title: table.title,
+        keywords: moduleKeywords[table.slug],
         group: table.group,
         groupLabel: groups.find((item) => item.id === table.group)?.label || 'Nómina',
       })),
     ],
-    [tables, groups],
+    [tables, groups, role],
   );
-  const results = useMemo(() => searchCommands(commands, query, group), [commands, query, group]);
+  const results = useMemo(() => {
+    const results = searchCommands(commands, query, group);
+    if (query || group) return results;
+    return results.sort(
+      (a, b) =>
+        (recent.includes(a.slug) ? recent.indexOf(a.slug) : 99) -
+        (recent.includes(b.slug) ? recent.indexOf(b.slug) : 99),
+    );
+  }, [commands, query, group, recent]);
 
   function changeOpen(value) {
     setOpen(value);
@@ -78,7 +108,7 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
   }
   function choose(command) {
     changeOpen(false);
-    go(command.slug);
+    go(command.slug, command.params || {});
   }
   function move(event) {
     if (event.nativeEvent.isComposing) return;
@@ -137,25 +167,41 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
                 <kbd>{shortcut}</kbd>
               </button>
             </Dialog.Trigger>
-            <a
-              className="workspace-create"
-              href={`${basePath}/alta-empleado`}
-              onClick={(event) => navigate(event, 'alta-empleado')}
-              aria-label="Contratar empleado"
-            >
-              <UserPlus size={17} aria-hidden="true" />
-              <span>Contratar</span>
-            </a>
+            {role !== roles.EMPLOYEE && (
+              <a
+                className="workspace-create"
+                href={`${basePath}/alta-empleado`}
+                onClick={(event) => navigate(event, 'alta-empleado')}
+                aria-label="Contratar empleado"
+              >
+                <UserPlus size={17} aria-hidden="true" />
+                <span>Contratar</span>
+              </a>
+            )}
           </div>
         </div>
-        <NavigationMenus
-          tables={tables}
-          groups={groups}
-          route={route}
-          basePath={basePath}
-          navigate={navigate}
-          paletteOpen={open}
-        />
+        {role === roles.EMPLOYEE ? (
+          <nav className="flex flex-wrap gap-4 px-5 py-3">
+            {[
+              ['mi-informacion', 'Mi información'],
+              ['calendario', 'Calendario'],
+              ['recomendaciones', 'Recomendaciones'],
+            ].map(([slug, title]) => (
+              <a key={slug} href={`${basePath}/${slug}`} onClick={(event) => navigate(event, slug)}>
+                {title}
+              </a>
+            ))}
+          </nav>
+        ) : (
+          <NavigationMenus
+            tables={tables}
+            groups={groups}
+            route={route}
+            basePath={basePath}
+            navigate={navigate}
+            paletteOpen={open}
+          />
+        )}
       </header>
       <Dialog.Portal>
         <Dialog.Overlay className="command-overlay" />
@@ -193,7 +239,9 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
               aria-autocomplete="list"
               aria-controls={listId}
               aria-activedescendant={
-                results[active] ? `${listId}-${results[active].slug}` : undefined
+                results[active]
+                  ? `${listId}-${results[active].id || results[active].slug}`
+                  : undefined
               }
               autoComplete="off"
               spellCheck="false"
@@ -229,7 +277,7 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
             aria-label="Secciones disponibles"
           >
             {results.map((command, index) => (
-              <div key={command.slug} role="presentation">
+              <div key={command.id || command.slug} role="presentation">
                 {results[index - 1]?.group !== command.group && (
                   <div className="command-group" role="presentation">
                     {command.groupLabel}
@@ -239,7 +287,7 @@ export function TopNavigation({ tables, groups, route, basePath, go, embedded })
                   type="button"
                   role="option"
                   tabIndex={-1}
-                  id={`${listId}-${command.slug}`}
+                  id={`${listId}-${command.id || command.slug}`}
                   data-index={index}
                   aria-selected={index === active}
                   className="command-result"

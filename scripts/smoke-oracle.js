@@ -56,6 +56,7 @@ function fixture(t, index = 1) {
     else if (f.type === 'NUMBER') row[f.name] = '1';
     else row[f.name] = f.input === 'time' ? '08:00' : f.maxLength < 10 ? 'X' : `Prueba ${index}`;
   }
+  if (t.name === 'ERP_EMPRESA') row.EMP_NIT = '7654321-8';
   if (t.name === 'ERP_PERSONA')
     Object.assign(row, { PER_TIPO: 'F', PER_NOMBRES: 'Prueba', PER_APELLIDOS: 'RRHH' });
   if (t.name === 'ERP_PERSONA_CORREO') row.PCO_CORREO = 'prueba@example.invalid';
@@ -101,7 +102,7 @@ try {
       )
     ).rows.flat();
   pool = await createPool({ ...process.env, NOM_DB_USER: tempUser, NOM_DB_PASSWORD: password });
-  const app = createApp({ pool });
+  const app = createApp({ pool, authentication: false });
   const pending = [...schema.masters, ...schema.tables],
     createdTables = [];
   while (pending.length) {
@@ -196,12 +197,17 @@ try {
     NPE_ANIO: '2027',
   };
   delete duplicateOpen.NPE_ID;
+  delete duplicateOpen.__version;
   const openResult = await request(app).post('/api/nomina/periodo').send(duplicateOpen);
   assert.equal(openResult.status, 409);
   assert.ok(openResult.body.fields.NPE_ESTADO);
   await verifyHr(app, testConnection, ids);
   for (const t of [...createdTables].filter((t) => t.name.startsWith('NOM_')).reverse())
     for (const id of [...ids[t.name]].reverse()) {
+      const before =
+        t.name === 'NOM_PERIODO'
+          ? (await request(app).get(`/api/nomina/${t.slug}/${id}`)).body
+          : null;
       const r = await request(app).delete(`/api/nomina/${t.slug}/${id}`);
       assert.equal(
         r.status,
@@ -212,7 +218,9 @@ try {
             : 204,
         `${t.name} DELETE ${JSON.stringify(r.body)}`,
       );
-      if (t.lifecycle.mode !== 'delete') {
+      if (t.name === 'NOM_PERIODO' && before.NPE_ESTADO === 'ABIERTO') {
+        assert.equal((await request(app).get(`/api/nomina/${t.slug}/${id}`)).status, 404);
+      } else if (t.lifecycle.mode !== 'delete') {
         const read = await request(app).get(`/api/nomina/${t.slug}/${id}`);
         assert.equal(read.status, 200);
         if (r.status === 204 && t.lifecycle.field && t.lifecycle.value)

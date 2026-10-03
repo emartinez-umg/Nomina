@@ -1,5 +1,6 @@
 // All identifiers below are schema constants. Values are always bound.
 const parents = {
+  PER_ID: ['ERP_PERSONA', 'PER_ID'],
   JOR_ID: ['NOM_JORNADA', 'JOR_ID'],
   EML_ID: ['NOM_EMPLEADO', 'EML_ID'],
   RLA_ID: ['NOM_RELACION_LABORAL', 'RLA_ID'],
@@ -9,6 +10,8 @@ const parents = {
   NPR_ID: ['NOM_PRESTAMO', 'NPR_ID'],
 };
 export function companyPredicate(table, catalog, alias = 't', depth = 0) {
+  if (table.name === 'ERP_PERSONA')
+    return `(NOT EXISTS (SELECT 1 FROM NOM_EMPLEADO pe WHERE pe.PER_ID=${alias}.PER_ID) OR EXISTS (SELECT 1 FROM NOM_EMPLEADO pe WHERE pe.PER_ID=${alias}.PER_ID AND pe.EMP_ID=TO_NUMBER(:company)))`;
   if (table.fields.some((f) => f.name === 'EMP_ID')) return `${alias}.EMP_ID=TO_NUMBER(:company)`;
   if (depth > 4) return null;
   for (const [field, [name, pk]] of Object.entries(parents)) {

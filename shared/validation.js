@@ -1,4 +1,7 @@
+import { validNit } from './identification.js';
 import Decimal from 'decimal.js';
+import { birthBounds } from './business-rules.js';
+import { stateOptions } from './workflow.js';
 import { evaluateCheck, checkFields } from './checks.js';
 import { hintFor, isPhone, validPhone } from './field-help.js';
 export { hintFor } from './field-help.js';
@@ -7,7 +10,7 @@ export function validDate(s, timestamp = false) {
   const re = timestamp
     ? /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,6}))?)?$/
     : /^(\d{4})-(\d{2})-(\d{2})$/;
-  const m = s.match(re);
+  const m = String(s).match(re);
   if (!m) return false;
   const [, year, month, day, h = '0', min = '0', sec = '0'] = m;
   const y = Number(year),
@@ -34,6 +37,7 @@ export function validatePayload(table, payload, { create = false } = {}) {
   for (const k of Object.keys(payload))
     if (!editable.some((f) => f.name === k)) errors[k] = 'Este campo no se puede modificar.';
   for (const f of editable) {
+    if (f.generated && create) continue;
     let v = payload[f.name];
     if (v === undefined && create && f.default !== undefined) {
       if (f.default === 'SYSTIMESTAMP') continue;
@@ -70,6 +74,12 @@ export function validatePayload(table, payload, { create = false } = {}) {
       }
       v = v.replace('-', '');
     }
+    if (f.name === 'EMP_NIT') {
+      if (!validNit(v))
+        errors[f.name] =
+          'Escribe un NIT sin espacios, con guion y dígito verificador válido (ej.: 1234567-9).';
+      v = v.toUpperCase();
+    }
     data[f.name] = v;
     if (f.type === 'NUMBER') {
       if (!/^-?\d+(?:\.\d+)?$/.test(v)) {
@@ -98,8 +108,19 @@ export function validatePayload(table, payload, { create = false } = {}) {
       data[f.name] =
         `${date}T${clock.length === 5 ? clock + ':00' : clock}.${fraction.padEnd(6, '0')}`;
     }
-    if (f.options && !f.options.includes(v)) errors[f.name] = 'Selecciona una opción permitida.';
+    if (stateOptions(f) && !stateOptions(f).includes(v))
+      errors[f.name] = `Selecciona: ${stateOptions(f).join(', ')}.`;
+    if (f.name === 'PER_FECHA_NACIMIENTO' && validDate(v)) {
+      const { min, max } = birthBounds();
+      if (v < min || v > max) errors[f.name] = `Selecciona una fecha entre ${min} y ${max}.`;
+    }
   }
+  if (
+    table.name === 'NOM_TRANSFERENCIA_PAGO' &&
+    data.TRP_ESTADO === 'CONFIRMADA' &&
+    !data.TRP_REFERENCIA?.trim()
+  )
+    errors.TRP_REFERENCIA = 'Ingresa la referencia bancaria para confirmar el pago.';
   for (const c of table.checks) {
     if (evaluateCheck(c.ast, data) === false) {
       const fields = checkFields(c.ast),

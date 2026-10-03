@@ -1,3 +1,5 @@
+import { verifyPayrollScenarios } from './lib/verify-payroll-scenarios.js';
+import { verifyPending } from './lib/verify-pending.js';
 // End-to-end workflows in a disposable Oracle schema. Existing records are never used.
 import oracledb from 'oracledb';
 import { loadEnvFile } from 'node:process';
@@ -39,8 +41,10 @@ try {
   await insertRows(c, demoData());
   await seedCatalogs(c);
   pool = await createPool({ ...process.env, NOM_DB_USER: user, NOM_DB_PASSWORD: password });
-  await verifyWorkflow(createApp({ pool }));
-  await verifyVacations(createApp({ pool }));
+  await verifyWorkflow(createApp({ pool, authentication: false }));
+  await verifyVacations(createApp({ pool, authentication: false }));
+  await verifyPending(pool, c);
+  await verifyPayrollScenarios(createApp({ pool, authentication: false }));
 } finally {
   if (pool) await pool.close(0);
   if (c) await c.close();

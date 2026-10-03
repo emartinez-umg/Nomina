@@ -1,6 +1,6 @@
 # Integración de Nómina al ERP
 
-El módulo aporta 35 CRUD de Nómina, 16 maestros compartidos necesarios para Recursos Humanos, dashboard, alta guiada y expediente. Mantiene la estructura Oracle instalada. No implementa autenticación, motor de cálculo fiscal, transferencias bancarias reales ni la operación de Contabilidad/CXC.
+El módulo aporta 35 CRUD de Nómina, 16 maestros compartidos necesarios para Recursos Humanos, dashboard, alta guiada y expediente. Mantiene la estructura Oracle instalada. Implementa autenticación propia sobre los usuarios ERP. No implementa motor de cálculo fiscal, transferencias bancarias reales ni la operación de Contabilidad/CXC.
 
 ## Backend
 
@@ -25,7 +25,9 @@ app.use(
 
 Los 16 maestros de RRHH utilizan los campos reales del ERP y se administran desde rutas `erp-*`. Solo ERP_USUARIO y CXC_DTE permanecen como referencias de lectura; `externalCatalogs` permite sobrescribir sus etiquetas. Para adaptar los maestros editables, modifica su contrato compartido y las validaciones, no solo las etiquetas. `ERP_PERSONA` presenta nombres y apellidos para personas físicas y razón social para personas jurídicas. Los nombres y PK referenciados por las FKs originales deben existir y ser accesibles; si están en otro esquema, el DBA debe acordar los grants y nombres calificados de la migración. No se cambia el DDL automáticamente para adivinar el contrato de otros equipos.
 
-Al integrar la sesión real, el ERP debe montar su middleware de permisos antes de este router y asignar `USU_ID_CREA` desde una identidad validada. Si hay aislamiento por empresa o sucursal, ese contexto y su filtro deben incorporarse al DAO antes de habilitar acceso multiempresa: el CRUD actual no constituye una frontera de autorización entre empresas. Se validan además coherencias entre empresa, sucursal, departamento, relación laboral y cuenta del empleado; estas validaciones no sustituyen las políticas de autorización del ERP.
+La autenticación propia está activada por defecto. El router valida sesión, empresa y rol antes de consultar o escribir. `USU_ID_CREA` se deriva de la sesión y no puede modificarse al editar. `resolveActor` se admite solo si el anfitrión establece explícitamente `authentication: false`; esa modalidad está destinada a pruebas o a un anfitrión que aplique una política de autenticación equivalente. No se debe desactivar la autenticación en el servidor independiente.
+
+Las escrituras requieren `X-Nomina-Request: 1`; `X-Nomina-Company` selecciona una empresa asignada. Los PUT genéricos requieren la versión devuelta por GET (`__version`) en `If-Match`. El frontend envía cookies con `credentials: include`. CORS debe restringirse al origen del ERP y producción debe servir HTTPS para la cookie Secure.
 
 ## Frontend
 
@@ -51,7 +53,7 @@ La hoja de estilos incluye Tailwind y los tokens de diseño del mockup. Al incor
 
 ## Decisiones pendientes del dominio
 
-Se respetan las columnas coexistentes de motivo y FK del catálogo. El banco se obtiene exclusivamente de BAN_ID; CBE_BANCO ya no existe. Se conserva la separación entre movimientos y tablas dedicadas; no hay sincronización contable automática. No se inventa una tabla o un estado INACTIVO para períodos o relaciones laborales. Los rangos ISR son parámetros administrables y no incluyen valores legales ni motor de cálculo.
+Se respetan las columnas coexistentes de motivo y FK del catálogo. El banco se obtiene exclusivamente de BAN_ID; CBE_BANCO ya no existe. Se conserva la separación entre movimientos y tablas dedicadas; no hay sincronización contable automática. Los períodos incorporan ANULADO y conservan su historial; solo los abiertos sin dependencias se eliminan físicamente. Los rangos ISR son parámetros administrables y no incluyen valores legales ni motor de cálculo.
 
 ## Contratos actualizados en septiembre de 2026
 
@@ -61,7 +63,7 @@ Los períodos no tienen empresa ni fechas almacenadas: usan NPE_ANIO, NPE_MES y 
 
 ## Alta guiada y dashboard
 
-`POST /api/nomina/hr/contrataciones` recibe `{person, employee, relation, email?, phone?}`; puede sustituir `person` por `personId` para una persona existente. El router abre una transacción y hace commit únicamente al guardar todos los registros. Un fallo revierte el alta, incluyendo contactos. Reutilizar la misma persona/empresa se rechaza: debe agregarse una relación al empleado existente. No hay generación automática de códigos de empleado ni un operador asumido por el backend. La interfaz preselecciona el operador solo si la consulta devuelve uno.
+`POST /api/nomina/hr/contrataciones` recibe `{person, employee, relation, email?, phone?}`; puede sustituir `person` por `personId` para una persona existente. El router abre una transacción y hace commit únicamente al guardar todos los registros. Un fallo revierte el alta, incluyendo contactos. Reutilizar la misma persona/empresa se rechaza: debe agregarse una relación al empleado existente. El código del empleado se genera en el servidor mediante un correlativo transaccional por empresa. El operador se obtiene de la sesión validada.
 
 `GET /api/nomina/hr/dashboard?company={id}` devuelve indicadores del equipo, novedades pendientes, hasta seis planillas recientes, ocho departamentos y diez expedientes incompletos. Los períodos son un calendario compartido y se muestran sin filtro de empresa. No se suman salarios a través de las relaciones para evitar duplicar remuneraciones de empleados con varios contratos. El resumen de planilla suma los detalles registrados y no calcula obligaciones fiscales.
 

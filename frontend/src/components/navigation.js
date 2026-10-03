@@ -1,4 +1,36 @@
 export const primaryPages = [
+  {
+    slug: 'mi-informacion',
+    title: 'Mi información y boletas',
+    group: 'general',
+    keywords: 'recibo sueldo pago personal',
+  },
+  {
+    slug: 'calendario',
+    title: 'Calendario',
+    group: 'general',
+    keywords: 'vacaciones asuetos pago fechas semana mes',
+  },
+  {
+    slug: 'recomendaciones',
+    title: 'Recomendar personas',
+    group: 'general',
+    keywords: 'candidato plaza recomendacion',
+  },
+  {
+    slug: 'usuarios',
+    title: 'Usuarios y roles',
+    group: 'general',
+    keywords: 'acceso permisos contraseña',
+  },
+  {
+    id: 'nuevo-periodo',
+    slug: 'periodo',
+    title: 'Nuevo período',
+    group: 'general',
+    keywords: 'crear quincena',
+    params: { nuevo: '1' },
+  },
   { slug: 'dashboard', title: 'Inicio', group: 'general', keywords: 'resumen dashboard' },
   { slug: 'alta-empleado', title: 'Contratar empleado', group: 'general', keywords: 'alta nuevo' },
   { slug: 'guia', title: 'Guía de uso', group: 'general', keywords: 'ayuda instrucciones' },
@@ -57,3 +89,12 @@ export function searchCommands(commands, query, group = '') {
     .sort((a, b) => a.rank - b.rank)
     .map(({ command }) => command);
 }
+
+export const moduleKeywords = {
+  empleado: 'sueldo salario personal',
+  nomina: 'sueldo salario aguinaldo bono catorce planilla',
+  ausencia: 'permiso incapacidad falta',
+  periodo: 'quincena mes corte',
+  vacacion: 'descanso saldo regreso',
+  'nomina-concepto': 'igss isr impuesto descuento',
+};

@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthGate';
 import { useWorkspace } from '../state/WorkspaceContext';
 import { companyScoped, stateOptions } from '../../../shared/workflow.js';
 import { friendlyOptions } from '../../../shared/hr-catalog.js';
@@ -70,8 +71,9 @@ function renderValue(row, f) {
   }
   return String(v);
 }
-export function EntityPage({ table, api, go }) {
+export function EntityPage({ table, api, go, readOnly = false }) {
   const workspace = useWorkspace();
+  const auth = useAuth();
   const urlParams = new URLSearchParams(location.search);
   const initialField =
     table.fields.find((f) => f.name === urlParams.get('filterField'))?.name || '';
@@ -97,7 +99,7 @@ export function EntityPage({ table, api, go }) {
     [direction, setDirection] = useState(saved.direction ?? 'asc'),
     [revision, setRevision] = useState(0),
     [modal, setModal] = useState(
-      urlParams.get('nuevo') === '1' ? { row: null, readOnly: false } : null,
+      !readOnly && urlParams.get('nuevo') === '1' ? { row: null, readOnly: false } : null,
     ),
     [confirm, setConfirm] = useState(null),
     [deleting, setDeleting] = useState(false),
@@ -164,6 +166,17 @@ export function EntityPage({ table, api, go }) {
     }
     return params;
   }
+  useEffect(() => {
+    const id = urlParams.get('registro');
+    if (!id || !/^\d{1,38}$/.test(id)) return;
+    const controller = new AbortController();
+    api(`/${table.slug}/${id}`, { signal: controller.signal })
+      .then((row) => setModal({ row, readOnly: readOnly || urlParams.get('editar') !== '1' }))
+      .catch((e) => {
+        if (e.name !== 'AbortError') setError(e.message);
+      });
+    return () => controller.abort();
+  }, [api, table.slug, location.search]);
   async function exportRows() {
     setExporting(true);
     try {
@@ -246,7 +259,8 @@ export function EntityPage({ table, api, go }) {
     try {
       await api(`/${table.slug}/${confirm[table.pk]}`, { method: 'DELETE' });
       toast.success(
-        table.lifecycle.mode === 'delete'
+        table.lifecycle.mode === 'delete' ||
+          (table.name === 'NOM_PERIODO' && confirm.NPE_ESTADO === 'ABIERTO')
           ? 'Registro eliminado.'
           : table.lifecycle.mode === 'inactive'
             ? 'Registro inactivado.'
@@ -291,13 +305,15 @@ export function EntityPage({ table, api, go }) {
               <Plus /> Contratar empleado
             </Button>
           )}
-          <Button
-            variant={table.name === 'NOM_EMPLEADO' ? 'outline' : 'default'}
-            onClick={() => setModal({ row: null, readOnly: false })}
-          >
-            <Plus />
-            {table.name === 'NOM_EMPLEADO' ? 'Solo ficha de empleado' : 'Agregar registro'}
-          </Button>
+          {!readOnly && (
+            <Button
+              variant={table.name === 'NOM_EMPLEADO' ? 'outline' : 'default'}
+              onClick={() => setModal({ row: null, readOnly: false })}
+            >
+              <Plus />
+              {table.name === 'NOM_EMPLEADO' ? 'Solo ficha de empleado' : 'Agregar registro'}
+            </Button>
+          )}
         </div>
       </div>
       {urlParams.get('pending') && (
@@ -312,9 +328,11 @@ export function EntityPage({ table, api, go }) {
       {company && (
         <p className="mt-3 text-sm text-primary">
           Vista limitada a la empresa de trabajo.{' '}
-          <button className="underline" onClick={() => workspace.setCompany('')}>
-            Ver todas las empresas
-          </button>
+          {auth?.user.localMode && (
+            <button className="underline" onClick={() => workspace.setCompany('')}>
+              Ver todas las empresas
+            </button>
+          )}
         </p>
       )}
       <div className="my-5 flex flex-wrap items-end gap-3">
@@ -725,31 +743,38 @@ export function EntityPage({ table, api, go }) {
                       >
                         <Eye className="text-blue-600" />
                       </Button>
-                      {!(
-                        (table.name === 'NOM_NOMINA' && row.NOM_ESTADO !== 'BORRADOR') ||
-                        (table.name === 'NOM_VACACION' && row.VAC_ESTADO !== 'SOLICITADA') ||
-                        (table.name === 'NOM_RELACION_LABORAL' &&
-                          row.RLA_ESTADO === 'FINALIZADA') ||
-                        (table.name === 'NOM_TRANSFERENCIA_PAGO' && row.TRP_ESTADO === 'CONFIRMADA')
-                      ) && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Editar registro"
-                          aria-label={`Editar registro ${row[table.pk]}`}
-                          disabled={detailLoading !== null}
-                          onClick={() => openRow(row, false)}
-                        >
-                          <Pencil className="text-amber-700" />
-                        </Button>
-                      )}
-                      {table.lifecycle.mode !== 'state' &&
+                      {!readOnly &&
+                        !(
+                          (table.name === 'NOM_NOMINA' && row.NOM_ESTADO !== 'BORRADOR') ||
+                          (table.name === 'NOM_VACACION' && row.VAC_ESTADO !== 'SOLICITADA') ||
+                          (table.name === 'NOM_RELACION_LABORAL' &&
+                            row.RLA_ESTADO === 'FINALIZADA') ||
+                          (table.name === 'NOM_TRANSFERENCIA_PAGO' &&
+                            row.TRP_ESTADO === 'CONFIRMADA')
+                        ) && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Editar registro"
+                            aria-label={`Editar registro ${row[table.pk]}`}
+                            disabled={detailLoading !== null}
+                            onClick={() => openRow(row, false)}
+                          >
+                            <Pencil className="text-amber-700" />
+                          </Button>
+                        )}
+                      {!readOnly &&
+                        table.lifecycle.mode !== 'state' &&
                         !['NOM_NOMINA', 'NOM_VACACION'].includes(table.name) && (
                           <Button
                             variant="ghost"
                             size="icon"
-                            title={table.lifecycle.label}
-                            aria-label={`${table.lifecycle.label} registro ${row[table.pk]}`}
+                            title={
+                              table.name === 'NOM_PERIODO' && row.NPE_ESTADO === 'ABIERTO'
+                                ? 'Eliminar período vacío'
+                                : table.lifecycle.label
+                            }
+                            aria-label={`${table.name === 'NOM_PERIODO' ? (row.NPE_ESTADO === 'ABIERTO' ? 'Eliminar período' : 'Anular período') : table.lifecycle.label + ' registro'} ${row[table.pk]}`}
                             disabled={
                               table.lifecycle.field &&
                               String(row[table.lifecycle.field]) === table.lifecycle.value
@@ -869,14 +894,20 @@ export function EntityPage({ table, api, go }) {
       >
         <AlertDialogContent>
           <AlertDialogTitle className="text-xl font-bold">
-            {table.lifecycle.label} registro
+            {table.name === 'NOM_PERIODO'
+              ? confirm?.NPE_ESTADO === 'ABIERTO'
+                ? 'Eliminar período'
+                : 'Anular período'
+              : table.lifecycle.label + ' registro'}
           </AlertDialogTitle>
           <AlertDialogDescription className="my-4 text-sm leading-relaxed text-muted-foreground">
-            {table.lifecycle.mode === 'delete'
-              ? 'El registro se eliminará permanentemente. Si tiene registros relacionados, la base de datos impedirá el borrado.'
-              : table.lifecycle.mode === 'inactive'
-                ? 'El registro quedará inactivo y conservará su información. Puedes reactivarlo desde la edición.'
-                : `El registro pasará al estado ${table.lifecycle.value}. Su información se conservará.`}
+            {table.name === 'NOM_PERIODO'
+              ? `¿${confirm?.NPE_ESTADO === 'ABIERTO' ? 'Eliminar' : 'Anular'} el período ${confirm?.NPE_QUINCENA ? (confirm.NPE_QUINCENA === '1' ? 'primera quincena de ' : 'segunda quincena de ') : ''}${confirm?.NPE_MES}/${confirm?.NPE_ANIO}? Solo se elimina físicamente si está abierto y no tiene registros relacionados. Los demás conservan su historial; las planillas vigentes impiden anularlo.`
+              : table.lifecycle.mode === 'delete'
+                ? 'El registro se eliminará permanentemente. Si tiene registros relacionados, la base de datos impedirá el borrado.'
+                : table.lifecycle.mode === 'inactive'
+                  ? 'El registro quedará inactivo y conservará su información. Puedes reactivarlo desde la edición.'
+                  : `El registro pasará al estado ${table.lifecycle.value}. Su información se conservará.`}
           </AlertDialogDescription>
           <div className="flex justify-end gap-3">
             <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>

@@ -119,7 +119,7 @@ test('deletion uses only existing active flags or cancellation states', () => {
       assert.ok(t.fields.find((f) => f.name === p.field).options.includes(p.value));
     if (p.mode === 'inactive') assert.match(p.field, /_ACTIV[OA]$/);
   }
-  assert.equal(table('PERIODO').lifecycle.mode, 'state');
+  assert.equal(table('PERIODO').lifecycle.mode, 'cancel');
   assert.equal(table('RELACION_LABORAL').lifecycle.mode, 'state');
   assert.equal(table('AUSENCIA').lifecycle.mode, 'state');
   assert.equal(table('JEFATURA_LABORAL').lifecycle.mode, 'inactive');
